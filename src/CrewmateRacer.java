@@ -4,15 +4,15 @@ import javafx.scene.layout.Pane;
 
 public class CrewmateRacer extends Pane{
     private int racerPosX = 0;
-      private int racerPosY = 0;
+   private int racerPosY = 0;
       private ImageView aPicView = null;
-      private boolean isMaster;
+      private boolean isImposter;
       private final static int WIDTH_OF_SCREEN = 800;
     private final static int HEIGHT_OF_SCREEN = 500;
 
-      public CrewmateRacer(boolean isMaster,String crewmateImage) {
-         this.isMaster = isMaster;
-         if (isMaster) {
+      public CrewmateRacer(boolean isImposter,String crewmateImage) {
+         this.isImposter = isImposter;
+         if (isImposter) {
             aPicView = new ImageView(crewmateImage);
             aPicView.setFitWidth(50);
             aPicView.setPreserveRatio(true);

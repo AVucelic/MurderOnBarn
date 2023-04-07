@@ -21,8 +21,10 @@ public class MovableBackground extends Pane {
       private int speed = 10;
       private Collison collison = new Collison();
       private ImageView aPicView = null;
+      private ImageView aPicView2= null;
       private boolean isMaster;
       private Image backgroundCollison;
+      private Image backgroundImage;
 
       /* 
       private boolean moveDown;
@@ -36,16 +38,19 @@ public class MovableBackground extends Pane {
 
 
 
-      public MovableBackground(String MASK_IMAGE) {
+      public MovableBackground(String MASK_IMAGE,String BACKGROUND_IMAGE) {
         backgroundCollison = new Image(MASK_IMAGE);
+        backgroundImage = new Image(BACKGROUND_IMAGE);
+        
         aPicView = new ImageView(MASK_IMAGE);
+        aPicView2 = new ImageView(BACKGROUND_IMAGE);
         Image sizer = new Image(MASK_IMAGE);
         // SVGPath maskBackground = new SVGPath();
         // maskBackground.setContent("mask2.svg");
         widthOfBackground = (int) sizer.getWidth();
         heightOfBackground = (int) sizer.getHeight();
 
-        this.getChildren().add(aPicView);
+        this.getChildren().addAll(aPicView,aPicView2);
 
      }
 
@@ -103,6 +108,8 @@ public class MovableBackground extends Pane {
         
         aPicView.setTranslateX(backgroundPosX);
         aPicView.setTranslateY(backgroundPosY);
+        aPicView2.setTranslateX(backgroundPosX);
+        aPicView2.setTranslateY(backgroundPosY);
 
         // players coordiante based on where it is on the background
         // only top left corenr for now

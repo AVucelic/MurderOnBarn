@@ -49,9 +49,9 @@ public class Game2DClean extends Application {
 
    private final static String MASK_IMAGE = "mask2.png";
 
-   private final static String MASK_IMAGE_SVG = "mask2.svg";
+   //private final static String MASK_IMAGE_SVG = "mask2.svg";
 
-   private final static String BACKGROUND_IMAGE = "map.svg";
+   private final static String BACKGROUND_IMAGE = "map.png";
 
    private final static int WIDTH_OF_SCREEN = 800;
    private final static int HEIGHT_OF_SCREEN = 500;
@@ -115,7 +115,7 @@ public class Game2DClean extends Application {
        * robotCrewmates.add(cr);
        * }
        */
-      moveablebackground = new MovableBackground(MASK_IMAGE);
+      moveablebackground = new MovableBackground(MASK_IMAGE,BACKGROUND_IMAGE);
 
       // add to the root
       this.root.getChildren().add(moveablebackground);
