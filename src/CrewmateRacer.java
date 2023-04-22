@@ -62,7 +62,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
 
    //for dummy imposter and other players
    public CrewmateRacer(boolean isImposter,String crewmateImage){
-      this.name = crewmateImage;
+      //this.name = crewmateImage;
       this.isImposter = isImposter;
       racerPosX = 400;
       racerPosY = 250;
@@ -132,7 +132,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
    public CrewmateRacer(boolean isImposter, String crewmateImage,MovableBackground move) {
       this.alive =true;
 
-      this.name = crewmateImage;
+      //this.name = crewmateImage;
       this.movement = move;
       this.isImposter = isImposter;
       aPicView = new ImageView(crewmateImage);

@@ -48,6 +48,8 @@ public class Server extends Application implements EventHandler<ActionEvent> {
    private int numPlayers = 0;
    private int numVotes = 0;
 
+   private int numOfImposters = 1;
+
    /**
     * ServerThread - a server menat to allow multiple connectioins
     */
@@ -146,13 +148,25 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         break;
                      // command to begin the game by sedning
                      case "Begin":
-                        oos.writeObject((Integer) outputStreams.size());
                         oos.writeObject((Integer) index);
                         oos.flush();
-                        // oos.writeObject(racers);
-                        // oos.flush();
+
+                        int randImp = (int)(Math.random() * oldLocations.size()); 
+                        oldLocations.get(randImp).setImposter(true);
+
+                        ArrayList<PlayerPoint> playerPoints = new ArrayList<>(oldLocations);
+                        oos.writeObject(playerPoints);
+                        oos.flush();
+
+                        
                         break;
                      case "AddToServer":
+                        String name = (String)ois.readObject();
+                        String imageName = (String)ois.readObject();
+                        oldLocations.get(index).setName(name);
+                        oldLocations.get(index).setImageName(imageName);
+                        oos.writeObject((Integer) index);
+                        oos.flush();
                         break;
                      case "move":
                         // just send array list of old locations
@@ -318,6 +332,9 @@ public class Server extends Application implements EventHandler<ActionEvent> {
             }
          } catch (IOException e) {
             e.printStackTrace();
+         } catch (ClassNotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
          }
 
       }
