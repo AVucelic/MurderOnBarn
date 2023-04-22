@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 import javax.swing.Action;
 
 import javafx.event.ActionEvent;
@@ -14,12 +16,19 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
+public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Serializable {
 
    // this is the player postion based on its top left image
    private int racerPosX = 0;
    private int racerPosY = 0;
 
+
+
+   private int racerPosXOnline = 0;
+   private int racerPosYOnline = 0;
+
+
+   private int locationOnServer;
 
    private boolean inMeeting;
 
@@ -27,6 +36,9 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
    private boolean isImposter;
    private final static int WIDTH_OF_SCREEN = 800;
    private final static int HEIGHT_OF_SCREEN = 500;
+
+   private final int STARTING_X = 400;
+   private final int STARTING_Y = 250;
 
    private Button btnReport;
    private Button btnUse;
@@ -41,39 +53,86 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
 
    private String name;
 
+   private int backgroundPosX;
+   private int backgroundPosY;
+
+
+   private boolean alive;
+
+
+   //for dummy imposter and other players
    public CrewmateRacer(boolean isImposter,String crewmateImage){
       this.name = crewmateImage;
       this.isImposter = isImposter;
+      racerPosX = 400;
+      racerPosY = 250;
+
+      
       aPicView = new ImageView(crewmateImage);
       aPicView.setFitWidth(50);
       aPicView.setPreserveRatio(true);
-      racerPosX = 400;
-      racerPosY = 500;
       aPicView.setTranslateX(racerPosX);
       aPicView.setTranslateY(racerPosY);
 
       this.getChildren().addAll(aPicView);
+      this.alive =true;
+      
+      
 
    }
+
+   public CrewmateRacer(String name , boolean isImposter){
+      this.name = name;
+      this.isImposter = isImposter;
+      racerPosX = 400;
+      racerPosY = 250;
+      this.alive = true;
+   }
+
+
 
    public void update(double x,double y){
       //need to alter the update statment in order correcly adjust were the task will be 
       //need to have add to it so it isnt just palce on the top left corner of the background movement 
-      int xForInter = (int)x + 1930 + 400;
-      int yForInter = (int)y + 160 + 500;
-      System.out.println("Background " +name + " X Cord " + xForInter);
-      System.out.println("Background " + name + " Y Cord " + yForInter);
+      
+      
+      
+      
+      
+      
+      
+      racerPosX = (int)x + 1930 + STARTING_X - 25;
+      racerPosY = (int)y + 160 + STARTING_Y - 25;
+      //System.out.println("Background " +name + " X Cord " + xForInter);
+      //System.out.println("Background " + name + " Y Cord " + yForInter);
+      aPicView.setTranslateX(racerPosX);
+      aPicView.setTranslateY(racerPosY);
+
+      //System.out.println("Moving other player with main player pos: " + " X " + racerPosX  +" Y "+ racerPosY);
+
+      
+  }
+  public void updateOnline(double x,double y){
+
+
+      int xForInter = (int)x + STARTING_X -25;
+      int yForInter = (int)y + STARTING_Y -25;
+      
+      
+      //System.out.println("Other player moved by server pos: " + " X " + xForInter  +" Y "+ yForInter);
+
       aPicView.setTranslateX(xForInter);
       aPicView.setTranslateY(yForInter);
 
-      racerPosX = xForInter;
-      racerPosY = yForInter;
   }
 
 
 
    //for the main player
    public CrewmateRacer(boolean isImposter, String crewmateImage,MovableBackground move) {
+      this.alive =true;
+
+      this.name = crewmateImage;
       this.movement = move;
       this.isImposter = isImposter;
       aPicView = new ImageView(crewmateImage);
@@ -83,7 +142,6 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
       racerPosY = HEIGHT_OF_SCREEN / 2 - 25;
       aPicView.setTranslateX(racerPosX);
       aPicView.setTranslateY(racerPosY);
-
       StackPane layout = new StackPane();
       this.btnReport = new Button("Report");
 
@@ -101,7 +159,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
 
          @Override
          public void handle(ActionEvent event) {
-            System.out.println("Reproting a dead body");
+            //System.out.println("Reproting a dead body");
             meeting();
             try {
                Thread.sleep(1000);
@@ -154,7 +212,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
          yDis = Math.pow(crewmate.getRacerPosY() - task.getPosYBasedOnBack(), 2);
       }
       double distance = Math.sqrt(xDis + yDis);
-      System.out.println("Distance between " + task.getName() + " and players posistion is:" + distance + "\n\n");
+      //System.out.println("Distance between " + task.getName() + " and players posistion is:" + distance + "\n\n");
       if (distance < 40) {
          return true;
       } else {
@@ -171,7 +229,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
          yDis = Math.pow(crewmate.getRacerPosY() - other.getRacerPosY(), 2);
       }
       double distance = Math.sqrt(xDis + yDis);
-      System.out.println("Distance between " +  "Other crew mate to kill" + " and players posistion is:" + distance + "\n\n");
+      //System.out.println("Distance between " +  "Other crew mate to kill" + " and players posistion is:" + distance + "\n\n");
       if (distance < 80) {
          return true;
       } else {
@@ -199,21 +257,9 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
                System.out.println("THIS WORKS THANKS ALLAH\n\n\n\n\n\n\n\n\n");
                System.out.println("Emergency Meeting\n\n\n\n\n\n\n\n\n");
                meeting();
-               try {
-                  Thread.sleep(5000);
-               } catch (InterruptedException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-               }
                break;
             case "Task 1":
                System.out.println("beggining task one\n\n\n\n\n\n\n\n\n");
-               try {
-                  Thread.sleep(5000);
-               } catch (InterruptedException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-               }
                break;
          }
       }
@@ -334,6 +380,54 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent> {
    public void kill(CrewmateRacer dummyKill) {
       dummyKill.getaPicView().setRotate(90);
       dummyKill.getaPicView().setOpacity(0.5);
+   }
+
+   public int getLocationOnServer() {
+      return locationOnServer;
+   }
+
+   public void setLocationOnServer(int locationOnServer) {
+      this.locationOnServer = locationOnServer;
+   }
+
+   public String getName() {
+      return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
+   }
+
+
+
+   public int getBackgroundPosX() {
+      return backgroundPosX;
+   }
+
+
+
+   public void setBackgroundPosX(int backgroundPosX) {
+      this.backgroundPosX = backgroundPosX;
+   }
+
+
+
+   public int getBackgroundPosY() {
+      return backgroundPosY;
+   }
+
+
+
+   public void setBackgroundPosY(int backgroundPosY) {
+      this.backgroundPosY = backgroundPosY;
+   }
+
+   public boolean isAlive() {
+      return alive;
+   }
+
+   public void setAlive(boolean alive) {
+      this.alive = alive;
    }
 
    

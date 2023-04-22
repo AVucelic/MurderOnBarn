@@ -31,8 +31,8 @@ public class Interactable extends Pane{
         //need to have add to it so it isnt just palce on the top left corner of the background movement 
         int xForInter = (int)x + 1930 + 400;
         int yForInter = (int)y + 160 + 200;
-        System.out.println("Background " +name + " X Cord " + xForInter);
-        System.out.println("Background " + name + " Y Cord " + yForInter);
+        //System.out.println("Background " +name + " X Cord " + xForInter);
+        //System.out.println("Background " + name + " Y Cord " + yForInter);
         interactable.setTranslateX(xForInter);
         interactable.setTranslateY(yForInter);
 

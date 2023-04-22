@@ -672,7 +672,7 @@ class Collison {
           }
 
        } else {
-          System.out.println("No collison");
+          //System.out.println("No collison");
 
        }
        return new Collison(collided, new Point2D(0, 0));
