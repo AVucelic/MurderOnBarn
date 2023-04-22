@@ -8,6 +8,21 @@ public class AmongUsSettings {
     String serverIP;
     int ipPORT;
     double playerSpeed;
+    int numImposters;
+    int killCoolDown;
+    int killDistance;
+
+    
+
+    public AmongUsSettings(String serverIP, int ipPORT, double playerSpeed, int numImposters, int killCoolDown,
+            int killDistance) {
+        this.serverIP = serverIP;
+        this.ipPORT = ipPORT;
+        this.playerSpeed = playerSpeed;
+        this.numImposters = numImposters;
+        this.killCoolDown = killCoolDown;
+        this.killDistance = killDistance;
+    }
 
     public AmongUsSettings() {
         
@@ -34,6 +49,19 @@ public class AmongUsSettings {
         this.playerSpeed = playerSpeed;
     }
 
+    @XmlElement
+    public void setNumImposters(int numImposters) {
+        this.numImposters = numImposters;
+    }
+    @XmlElement
+    public void setKillCoolDown(int killCoolDown) {
+        this.killCoolDown = killCoolDown;
+    }
+    @XmlElement
+    public void setKillDistance(int killDistance) {
+        this.killDistance = killDistance;
+    }
+
     public String getServerIP() {
         return serverIP;
     }
@@ -45,6 +73,20 @@ public class AmongUsSettings {
     public double getPlayerSpeed() {
         return playerSpeed;
     }
+
+    public int getNumImposters() {
+        return numImposters;
+    }
+
+    public int getKillCoolDown() {
+        return killCoolDown;
+    }
+
+    public int getKillDistance() {
+        return killDistance;
+    }
+    
+
 
     @Override
     public String toString() {

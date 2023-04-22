@@ -19,10 +19,10 @@ public class MovableBackground extends Pane {
 
    private int playerX = STARTING_X_ON_SCREEN;
    private int playerY = STARTING_Y_ON_SCREEN;
-
+   private AmongUsSettings settings = new AmongUsSettings();
    private int widthOfBackground = 0;
    private int heightOfBackground = 0;
-   private int speed = 10;
+   private int speed = 10;//(int)settings.getPlayerSpeed();
    private Collison collison = new Collison();
    private ImageView aPicView = null;
    private ImageView aPicView2 = null;

@@ -8,7 +8,7 @@ public class XML_STUFF {
 
     void writeXML() {
         // Example how to write
-        AmongUsSettings amongUsSettings = new AmongUsSettings("localhost", 1234, 40);
+        AmongUsSettings amongUsSettings = new AmongUsSettings("127.0.0.1", 32001, 10.0, 2, 30, 100);
 
         try {
 

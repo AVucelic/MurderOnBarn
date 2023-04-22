@@ -103,6 +103,7 @@ public class Game2DClean extends Application {
 
    private Scene newScene =null;
    private Stage newStage = null;
+   private AmongUsSettings settings = new AmongUsSettings();
 
    // main program
    public static void main(String[] _args) {
@@ -112,6 +113,7 @@ public class Game2DClean extends Application {
 
    // start() method, called via launch
    public void start(Stage _stage) {
+
       // stage seteup
       stage = _stage;
       stage.setTitle("Game2D Starter");
@@ -269,6 +271,7 @@ public class Game2DClean extends Application {
 
    // start the game scene
    public void initializeScene() {
+      
 
       try {
          socket = new Socket("127.0.0.1", SERVER_PORT);
