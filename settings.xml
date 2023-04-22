@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<amongUsSettings>
+    <ipPORT>32001</ipPORT>
+    <killCoolDown>30</killCoolDown>
+    <killDistance>100</killDistance>
+    <numImposters>2</numImposters>
+    <playerSpeed>10.0</playerSpeed>
+    <serverIP>127.0.0.1</serverIP>
+</amongUsSettings>
