@@ -33,6 +33,8 @@ public class TaskWires extends Application implements EventHandler<ActionEvent>{
     private Label lblWire;
     private TextField tfWire;
 
+    private boolean completed = false;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -118,6 +120,7 @@ public class TaskWires extends Application implements EventHandler<ActionEvent>{
             } 
             //If all wires are connecte, close the stage
             else{
+                completed = true;
                 Stage stage = (Stage) lblInstruction.getScene().getWindow();
                 stage.close();
             }
@@ -144,6 +147,18 @@ public class TaskWires extends Application implements EventHandler<ActionEvent>{
         lblWire.setText(wireConnections[wireIndex]);
         tfWire.setText(" ");
     }
+
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    
 
 
     /*public static void main(String[] args) {

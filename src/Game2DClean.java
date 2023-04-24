@@ -21,21 +21,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-/**
- * AmongUSStarter with JavaFX and Threads
- * Loading imposters
- * Loading background
- * Control actors and backgrounds
- * Create many number of imposters - random controlled
- * RGB based collision
- * Collsion between two imposters
- */
+
 
 /**
  * Game2DClean - The start up for the code
  * 
  * @author Luka Lasic
- * @author Arian Vuelic
  * @since 25-3-2023
  * @version 0.5
  */
@@ -44,6 +35,9 @@ public class Game2DClean extends Application {
    private Stage stage;
    private Scene scene;
    private StackPane root;
+
+   private int numTasks =3;
+   private int numCompletedTasks = 0;
 
    private static String[] args;
 
@@ -109,7 +103,7 @@ public class Game2DClean extends Application {
 
    private String name;
 
-
+   private XML_STUFF xmlSettings = new XML_STUFF();
    private boolean isImposter;
 
    // main program
@@ -210,8 +204,64 @@ public class Game2DClean extends Application {
 
       });
 
+      Button btnSettings = new Button("Settings");
+      btnSettings.setOnAction(new EventHandler<ActionEvent>() {
+
+         @Override
+         public void handle(ActionEvent event) {
+            Stage settingsStage = new Stage();
+            VBox settingsRoot = new VBox();
+            xmlSettings.readXML();
+            Label lblPortNum = new Label("Port Number:");
+            TextField txtIpNum = new TextField(""+xmlSettings.player.getIpPORT());
+
+            Label lblKillCoolDown = new Label("KillCoolDown: ");
+            TextField txtKillCoolDown = new TextField("" + xmlSettings.player.getKillCoolDown());
+
+            Label lblKillDis = new Label("KillDistance: ");
+            TextField txtKillDistance = new TextField("" + xmlSettings.player.getKillDistance());
+
+            Label lblSpeed= new Label("Speed:");
+            TextField txtSpeed = new TextField("" + xmlSettings.player.getPlayerSpeed());
+
+            Label lblIpAddres = new Label("Ip Address:");
+            TextField txtIpAddress = new TextField("IP" + xmlSettings.player.getServerIP());
+
+            settingsRoot.getChildren().addAll(lblPortNum,txtIpNum,lblKillCoolDown,txtKillCoolDown,lblKillDis,txtKillDistance,lblSpeed,txtSpeed,lblIpAddres,txtIpAddress);
+
+            Button btnSave = new Button("Save Changes");
+
+            btnSave.setOnAction(new EventHandler<ActionEvent>() {
+
+               @Override
+               public void handle(ActionEvent event) {
+                  int ipPort = Integer.parseInt(txtIpNum.getText().trim());
+                  int killCool = Integer.parseInt(txtKillCoolDown.getText().trim());
+                  int killDis = Integer.parseInt(txtKillDistance.getText().trim());
+                  int speed = Integer.parseInt(txtSpeed.getText().trim());
+                  String ipAddress = txtIpAddress.getText().trim();
+                  xmlSettings.player.setIpPORT(ipPort);
+                  xmlSettings.player.setKillCoolDown(killCool);
+                  xmlSettings.player.setKillDistance(killDis);
+                  xmlSettings.player.setPlayerSpeed(speed);
+                  xmlSettings.player.setServerIP(ipAddress);
+                  settingsStage.close();
+               }
+               
+            });
+
+
+            
+
+            Scene settingsScene = new Scene(settingsRoot, 400, 300);
+            settingsStage.setScene(settingsScene);
+            settingsStage.show();
+         }
+         
+      });
+
       VBox top = new VBox();
-      top.getChildren().addAll(btnStart, changeCharacter);
+      top.getChildren().addAll(btnStart, changeCharacter,btnSettings);
       top.setAlignment(Pos.CENTER);
 
       root.getChildren().addAll(top);
@@ -342,8 +392,12 @@ public class Game2DClean extends Application {
 
       // Adding an interactable object
       Interactable task1 = new Interactable("amongus.png");
+      Interactable task2 = new Interactable("amongus.png");
+      task2.moveInteractable(-750, -100);
+      Interactable task3 = new Interactable("amongus.png");
+      task3.moveInteractable(1600, -100);
       EmergencyButton emergencyButton = new EmergencyButton("EmergencyButton.webp");
-      this.root.getChildren().addAll(task1, emergencyButton);
+      this.root.getChildren().addAll(task1,task2,task3, emergencyButton);
 
       
       
@@ -380,6 +434,8 @@ public class Game2DClean extends Application {
 
 
       masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE, moveablebackground);
+      // masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
+
       masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
       otherCrewmates.add(masterCrewmate);
 
@@ -524,8 +580,11 @@ public class Game2DClean extends Application {
                if (obj instanceof String) {
                   String command = (String) obj;
                   switch (command) {
+                     case "changeSpeed":
+                        moveablebackground.setSpeed((int)ois.readObject());
+                        break;
                      case "newplayer":
-
+                        break;
                      case "move":
                         int size = (int)ois.readObject();
                         ArrayList<PlayerPoint> oldLocations = new ArrayList<>();
@@ -572,7 +631,7 @@ public class Game2DClean extends Application {
                               @Override
                               public void handle(ActionEvent event) {
                                  String line = masterCrewmate.getName() + message.getText() + "\n";
-                                 chatbox.appendText("User: " + line + "\n");
+                                 //chatbox.appendText("User: " + line + "\n");
                                  try {
                                     oos.writeObject("Chat");
                                     oos.writeObject(line);
@@ -674,6 +733,7 @@ public class Game2DClean extends Application {
                            if(otherCrewmates.get(i).getLocationOnServer() == deadCrewmate.getIndex()){
                               System.out.println("This player has dead " + otherCrewmates.get(i).getName());
                               otherCrewmates.get(i).setAlive(false);
+                              
                               if(masterCrewmate.getLocationOnServer() == deadCrewmate.getIndex()){
                                  System.out.println("You have died");
                               }else{
@@ -684,6 +744,19 @@ public class Game2DClean extends Application {
                            }
                            
                         }
+                        break;
+                     case "impostersWin":
+                        Platform.runLater(new Runnable() {
+
+                           @Override
+                           public void run() {
+                              Alert alert = new Alert(AlertType.INFORMATION, "The imposters win");
+                              alert.showAndWait();
+                              
+                           }
+                           
+                        });
+                        
                         break;
                   }
 
@@ -782,6 +855,10 @@ public class Game2DClean extends Application {
             }
 
             task1.update(location.getX(), location.getY());
+            task2.update(location.getX(), location.getY());
+            task3.update(location.getX(), location.getY());
+
+
             emergencyButton.update(location.getX(), location.getY());
 
             
@@ -792,6 +869,8 @@ public class Game2DClean extends Application {
 
             //allowing one to get the report button  when they are close
             //to the emergency button or when they are close a dead crewmate
+
+            //for normal crewmates tasks 
             if(!masterCrewmate.isImposter()){
                if (checkDistance(masterCrewmate, task1)) {
                   synchronized (masterCrewmate) {
@@ -801,13 +880,113 @@ public class Game2DClean extends Application {
                      // task.addHighlight();
 
                   }
-               } else {
+               } else if(checkDistance(masterCrewmate, task2)){
+                  synchronized (masterCrewmate) {
+
+                     masterCrewmate.getBtnUse().setDisable(false);
+                     masterCrewmate.setToUse("Task 2");
+                     // task.addHighlight();
+
+                  }
+
+               }else if(checkDistance(masterCrewmate, task3)){
+                  synchronized (masterCrewmate) {
+
+                     masterCrewmate.getBtnUse().setDisable(false);
+                     masterCrewmate.setToUse("Task 3");
+                     // task.addHighlight();
+
+                  }
+                  
+               }else {
                   masterCrewmate.getBtnUse().setDisable(true);
+               }
+
+
+
+               if(masterCrewmate.getBtnUse().isPressed()){
+                  Stage tempStage = new Stage();
+                  
+                  if(masterCrewmate.getToUse().equals("Task 1")){
+                     TaskWires task = new TaskWires();
+                     tempStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+                        @Override
+                        public void handle(WindowEvent event) {
+                           if(task.isCompleted()){
+                              try {
+                                 oos.writeObject("addTask");
+                              } catch (IOException e) {
+                                 // TODO Auto-generated catch block
+                                 e.printStackTrace();
+                              }
+                              numCompletedTasks++;
+                              double total = (double)numCompletedTasks/numTasks;
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    masterCrewmate.getProgressBar().setProgress(total);
+                                 }
+                                 
+                              });
+                           }
+                        }
+                        
+                     });
+                     try {
+                        task.start(tempStage);
+                        
+                     } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                     }
+                  }else if(masterCrewmate.getToUse().equals("Task 2")){
+                     TaskDownload task = new TaskDownload();
+                     tempStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+                        @Override
+                        public void handle(WindowEvent event) {
+                           if(task.isCompleted()){
+                              try {
+                                 oos.writeObject("addTask");
+                              } catch (IOException e) {
+                                 // TODO Auto-generated catch block
+                                 e.printStackTrace();
+                              }
+                              numCompletedTasks++;
+                              double total = (double)numCompletedTasks/numTasks;
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    masterCrewmate.getProgressBar().setProgress(total);
+                                 }
+                                 
+                              });
+                           }
+                        }
+                        
+                     });
+                     try {
+                        task.start(tempStage);
+                        
+                     } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                     }
+                  }else if(masterCrewmate.getToUse().equals("Task 3")){
+
+                  }
+                  
+                  
                }
             }
 
+            
 
 
+            //for reproting or emergency button
             if (emergencyButton.distanceEmgButton(masterCrewmate) || check()) {
                synchronized (masterCrewmate) {
                   masterCrewmate.getBtnReport().setDisable(false);
@@ -816,7 +995,6 @@ public class Game2DClean extends Application {
                masterCrewmate.setToUse("Emergency");
             }else{
                masterCrewmate.getBtnReport().setDisable(true);
-               masterCrewmate.setToUse("");
             }
 
             
@@ -864,6 +1042,39 @@ public class Game2DClean extends Application {
                      oos.flush();
                      oos.writeObject(killable.getLocationOnServer());
                      oos.flush();
+                  } catch (IOException e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
+                  }
+                  
+               }
+
+               if(masterCrewmate.getBtnSabatoage().isPressed()){
+                  try {
+                     oos.writeObject("sabtoge");
+                     oos.flush();
+                     oos.writeObject(moveablebackground.getSpeed()/2);
+                     oos.flush();
+                     Timer slow = new Timer();
+                     TimerTask slowLimit = new TimerTask() {
+
+                        @Override
+                        public void run() {
+                           try {
+                              oos.writeObject("sabtoge");
+                              oos.flush();
+                              oos.writeObject(moveablebackground.getSpeed()*2);
+                              oos.flush();
+                           } catch (IOException e) {
+                              // TODO Auto-generated catch block
+                              e.printStackTrace();
+                           }
+                     
+                        }
+                        
+                     };
+                     slow.schedule(slowLimit, 10000);
+                     
                   } catch (IOException e) {
                      // TODO Auto-generated catch block
                      e.printStackTrace();

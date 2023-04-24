@@ -8,14 +8,14 @@ import javafx.scene.layout.Pane;
 public class Interactable extends Pane{
     //strating postion of the task 
     private int posXBasedOnBack = -1930 + 1930 + 400;
-    private int posYBasedOnBack  = -160 + 160 + 150;
+    private int posYBasedOnBack  = -160 + 160 + 200;
     private ImageView interactable;
     private String name;
 
     public Interactable(String name){
         interactable = new ImageView(name);
-        interactable.setFitWidth(10);
-        interactable.setFitHeight(10);
+        interactable.setFitWidth(30);
+        interactable.setFitHeight(30);
         interactable.setStyle("-fx-border-color : yellow; -fx-border-width : 2;");
         this.name = name;
         this.getChildren().addAll(interactable);
@@ -29,15 +29,14 @@ public class Interactable extends Pane{
     public void update(double x,double y){
         //need to alter the update statment in order correcly adjust were the task will be 
         //need to have add to it so it isnt just palce on the top left corner of the background movement 
-        int xForInter = (int)x + 1930 + 400;
-        int yForInter = (int)y + 160 + 200;
+        int xForInter = (int)x + 1930 + posXBasedOnBack;
+        int yForInter = (int)y + 160 + posYBasedOnBack;
         //System.out.println("Background " +name + " X Cord " + xForInter);
         //System.out.println("Background " + name + " Y Cord " + yForInter);
         interactable.setTranslateX(xForInter);
         interactable.setTranslateY(yForInter);
 
-        posXBasedOnBack = xForInter;
-        posYBasedOnBack = yForInter;
+    
     }
     public void addHighlight(){
         interactable.setStyle("-fx-border-color: yellow; -fx-border-width: 50;");

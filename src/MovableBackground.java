@@ -29,6 +29,7 @@ public class MovableBackground extends Pane {
    private boolean isMaster;
    private Image backgroundCollison;
    private Image backgroundImage;
+   private XML_STUFF xmlWorker = new XML_STUFF();
 
    /*
     * private boolean moveDown;
@@ -39,6 +40,10 @@ public class MovableBackground extends Pane {
    private TrackMovement tm = new TrackMovement();
 
    public MovableBackground(String MASK_IMAGE, String BACKGROUND_IMAGE) {
+      xmlWorker.readXML();
+      
+      speed = (int) xmlWorker.player.getPlayerSpeed();
+
       backgroundCollison = new Image(MASK_IMAGE);
       backgroundImage = new Image(BACKGROUND_IMAGE);
 

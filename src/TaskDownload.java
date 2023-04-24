@@ -27,6 +27,8 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
     private ArrayList<InnerClass> progress = new ArrayList<>();
     private Label lblStart = new Label("Click Start To Start Your Task!");
 
+    private boolean completed = false;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -126,6 +128,7 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
                         public void run(){
                             Alert alert = new Alert(AlertType.INFORMATION, "Task Completed! Click \"OK\" to exit");
                             alert.showAndWait();
+                            completed = true;
 
                             try {
                                 Thread.sleep(1000);
@@ -146,4 +149,13 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
         }
         
     }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+    
 }

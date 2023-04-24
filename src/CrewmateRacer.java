@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +32,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
    private int locationOnServer;
 
    private boolean inMeeting;
+   private ProgressBar progressBar = null;
 
    private ImageView aPicView = null;
    private boolean isImposter;
@@ -188,13 +190,18 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
       }
 
       this.tasks = new TextArea();
+      tasks.appendText("Task Wires\n");
+      tasks.appendText("Task Click\n");
+      tasks.appendText("Task Download\n");
       tasks.setPrefWidth(100);
       tasks.setPrefHeight(50);
       tasks.setDisable(true);
       FlowPane tasksArea = new FlowPane();
       tasksArea.setPrefWidth(WIDTH_OF_SCREEN);
       tasksArea.setPrefHeight(HEIGHT_OF_SCREEN);
-      tasksArea.getChildren().addAll(tasks);
+      this.progressBar = new ProgressBar();
+
+      tasksArea.getChildren().addAll(progressBar,tasks);
       tasksArea.setAlignment(Pos.TOP_LEFT);
 
       layout.getChildren().addAll(tasksArea, btnsForUser);
@@ -243,13 +250,13 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
 
    @Override
    public void handle(ActionEvent event) {
-      System.out.println("DDDDD");
-      try {
-         Thread.sleep(5000);
-      } catch (InterruptedException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
+      // System.out.println("DDDDD");
+      // try {
+      //    Thread.sleep(5000);
+      // } catch (InterruptedException e) {
+      //    // TODO Auto-generated catch block
+      //    e.printStackTrace();
+      // }
       Object obj = event.getSource();
       if (obj instanceof Button) {
          switch (toUse) {
@@ -258,7 +265,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
                System.out.println("Emergency Meeting\n\n\n\n\n\n\n\n\n");
                meeting();
                break;
-            case "Task 1":
+            case "Task1":
                System.out.println("beggining task one\n\n\n\n\n\n\n\n\n");
                break;
          }
@@ -429,6 +436,16 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
    public void setAlive(boolean alive) {
       this.alive = alive;
    }
+
+   public ProgressBar getProgressBar() {
+      return progressBar;
+   }
+
+   public void setProgressBar(ProgressBar progressBar) {
+      this.progressBar = progressBar;
+   }
+
+   
 
    
 

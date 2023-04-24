@@ -5,6 +5,7 @@ import java.util.*;
 import javax.xml.stream.Location;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -50,6 +51,9 @@ public class Server extends Application implements EventHandler<ActionEvent> {
 
    private int numOfImposters = 1;
 
+   private int numOfTotalTasks = 0;
+   private int numOfCompletedTasks = 0;
+
    /**
     * ServerThread - a server menat to allow multiple connectioins
     */
@@ -92,9 +96,19 @@ public class Server extends Application implements EventHandler<ActionEvent> {
       private Socket cSocket = null;
       private String cName = "";
       private boolean keepGoing = true;
+      private int numPlayerTasksDone = 0;
       
 
       private int index;
+      private TextField txtClientName = new TextField();
+      
+      private TextField txtPLayerIndex = new TextField();
+      private TextField txtPlayerName = new TextField();
+      private TextField txtPlayerLoc = new TextField();
+      private TextField txtisImposter = new TextField("Imposter: ");
+      private TextField txtPlayerNumTasksDone = new TextField("Num Tasks Done: ");
+
+
 
       /**
        * Constrcutor for the clieant thread
@@ -103,9 +117,36 @@ public class Server extends Application implements EventHandler<ActionEvent> {
        * @param _name    //Name of the client
        */
       public ClientThread(Socket _cSocket, String _name) {
+         txtClientName.setEditable(false);
+         txtClientName.setPrefWidth(100);
+         txtPLayerIndex.setEditable(false);
+         txtPLayerIndex.setPrefWidth(100);
+         txtPlayerName.setEditable(false);
+         txtPlayerName.setPrefWidth(100);
+         txtPlayerLoc.setEditable(false);
+         txtPlayerLoc.setPrefWidth(100);
+         txtisImposter.setEditable(false);
+         txtisImposter.setPrefWidth(100);
+         txtPlayerNumTasksDone.setEditable(false);
+         txtPlayerNumTasksDone.setPrefWidth(100);
          this.cSocket = _cSocket;
          this.cName = _name;
          this.index = numPlayers - 1;
+
+         VBox serverRoot = (VBox) scene.getRoot();
+         VBox box = new VBox();
+         txtClientName.setText(_name);
+         txtPLayerIndex.setText(""+index);
+         box.getChildren().addAll(txtClientName,txtPLayerIndex,txtPlayerName,txtPlayerLoc,txtisImposter,txtPlayerNumTasksDone);
+         
+         synchronized(outputStreams){
+            Platform.runLater(() -> {
+               serverRoot.getChildren().addAll(box);
+            });
+         }
+         
+         
+
       }
 
       public void run() {
@@ -135,12 +176,48 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                if (obj instanceof String) {
                   String commad = (String) obj;
                   switch (commad) {
+                     case "sabtoge":
+                        int speed = (int)ois.readObject();
+                        for (int i = 0; i < outputStreams.size(); i++) {
+                           outputStreams.get(i).writeObject("changeSpeed");
+                           outputStreams.get(i).close();
+                           outputStreams.get(i).writeObject(speed);
+                           outputStreams.get(i).close();
+                        }
+                        break;
+                     case "addTask":
+                        synchronized(outputStreams){
+                           numOfCompletedTasks++;
+                           numPlayerTasksDone++;
+                           Platform.runLater(new Runnable() {
+
+                              @Override
+                              public void run() {
+                                 txtPlayerNumTasksDone.setText("" + numPlayerTasksDone);
+                              }
+                              
+                           });
+                        }
+
+                        break;
+
                      case "addName":
                         try {
                            String name = (String)ois.readObject();
                            oldLocations.get(index).setName(name);
                            boolean isImposter = (boolean)ois.readObject();
                            oldLocations.get(index).setImposter(isImposter);
+                           synchronized(outputStreams){
+                              Platform.runLater(new Runnable() {
+   
+                                 @Override
+                                 public void run() {
+                                    txtisImposter.appendText("" + isImposter);
+                                    txtPlayerName.setText(name);
+                                 }
+                                 
+                              });
+                           }
                         } catch (ClassNotFoundException e) {
                            // TODO Auto-generated catch block
                            e.printStackTrace();
@@ -148,6 +225,9 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         break;
                      // command to begin the game by sedning
                      case "Begin":
+                        synchronized(outputStreams){
+                           numOfTotalTasks = 3 * numPlayers;
+                        }
                         oos.writeObject((Integer) index);
                         oos.flush();
 
@@ -166,6 +246,17 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         oldLocations.get(index).setName(name);
                         oldLocations.get(index).setImageName(imageName);
                         oos.writeObject((Integer) index);
+                        synchronized(outputStreams){
+                           Platform.runLater(new Runnable() {
+
+                              @Override
+                              public void run() {
+                                 txtisImposter.appendText("" + oldLocations.get(index).isImposter());
+                                 txtPlayerName.setText(name);
+                              }
+                              
+                           });
+                        }
                         oos.flush();
                         break;
                      case "move":
@@ -217,6 +308,16 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         try {
                            String message = (String) ois.readObject();
                            System.out.println(message);
+                           synchronized(outputStreams){
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    info.appendText(message + "\n");
+                                 }
+                                 
+                              });
+                           }
                            for (int i = 0; i < outputStreams.size(); i++) {
                               outputStreams.get(i).writeObject("addmessage");
                               outputStreams.get(i).writeObject(message);
@@ -286,14 +387,28 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         break;
                      case "kill":
                         try {
-                           int index = (int)ois.readObject();
-                           oldLocations.get(index).setAlive(false);
+                           
+                           
+                           int indexDead = (int)ois.readObject();
+
+                           oldLocations.get(indexDead).setAlive(false);
                            for(int i =0; i<oldLocations.size();i++){
                                  outputStreams.get(i).writeObject("dead");
                                  outputStreams.get(i).flush();
-                                 outputStreams.get(i).writeObject(oldLocations.get(index));
+                                 outputStreams.get(i).writeObject(oldLocations.get(indexDead));
                                  outputStreams.get(i).flush();
                               
+                           }
+                           String message = oldLocations.get(index).getName() + "killed " + oldLocations.get(indexDead).getName();
+                           synchronized(outputStreams){
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    info.appendText(message + "\n");
+                                 }
+                                 
+                              });
                            }
                         } catch (ClassNotFoundException e) {
                            // TODO Auto-generated catch block
@@ -317,6 +432,15 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                   synchronized(oldLocations){
                      oldLocations.get(index).setX(locatioin.getX());
                      oldLocations.get(index).setY(locatioin.getY());
+                     Platform.runLater(new Runnable() {
+   
+                        @Override
+                        public void run() {
+                           txtPlayerLoc.setText("(" +locatioin.getX() +","+  locatioin.getY() +  ")");
+                        }
+                        
+                     });
+
                   }
                   System.out.println(cName + "X: " + locatioin.getX() + " Y: " + locatioin.getY());
                   for (int i = 0; i < outputStreams.size(); i++) {
