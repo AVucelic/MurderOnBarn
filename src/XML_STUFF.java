@@ -5,8 +5,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 public class XML_STUFF {
+    public AmongUsSettings player = null;
+    public XML_STUFF(){
+        player = new AmongUsSettings();
+    }
 
-    void writeXML() {
+    public void writeXML() {
         // Example how to write
         AmongUsSettings amongUsSettings = new AmongUsSettings("127.0.0.1", 32001, 10.0, 2, 30, 100);
 
@@ -27,7 +31,7 @@ public class XML_STUFF {
         }
     }
 
-    void readXML() {
+    public void readXML() {
         File xmlFile = new File("settings.xml");
 
         JAXBContext jaxbContext;
@@ -36,9 +40,9 @@ public class XML_STUFF {
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-            AmongUsSettings employee = (AmongUsSettings) jaxbUnmarshaller.unmarshal(xmlFile);
-            System.out.println(employee);
-
+            this.player = (AmongUsSettings) jaxbUnmarshaller.unmarshal(xmlFile);
+            System.out.println(player);
+            
         } catch (JAXBException e) {
             e.printStackTrace();
         }
@@ -49,5 +53,9 @@ public class XML_STUFF {
         new XML_STUFF().readXML();
 
     }
+
+    
+
+
 
 }

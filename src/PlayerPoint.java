@@ -10,6 +10,8 @@ public class PlayerPoint implements Serializable{
     private int numVotes =0;
     private boolean isAlive;
 
+    private String imageName;
+
     public PlayerPoint(int x, int y,int index){
         this.x =x;
         this.y =y;
@@ -70,6 +72,14 @@ public class PlayerPoint implements Serializable{
 
     public void setAlive(boolean isAlive) {
         this.isAlive = isAlive;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
     
     
