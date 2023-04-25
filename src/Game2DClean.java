@@ -422,9 +422,9 @@ public class Game2DClean extends Application {
       // e.printStackTrace();
       // }
 
-      // masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE,
+      masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE,moveablebackground);
       // moveablebackground);
-      masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
+      // masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
 
       masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
       masterCrewmate.setName(name);
