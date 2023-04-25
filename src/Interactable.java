@@ -12,6 +12,9 @@ public class Interactable extends Pane{
     private ImageView interactable;
     private String name;
 
+    private int stupidX = 0;
+    private int stupidY = 0;
+
     public Interactable(String name){
         interactable = new ImageView(name);
         interactable.setFitWidth(30);
@@ -72,6 +75,20 @@ public class Interactable extends Pane{
     public void setName(String name) {
         this.name = name;
     }
+    public int getStupidX() {
+        return stupidX;
+    }
+    public void setStupidX(int stupidX) {
+        this.stupidX = stupidX;
+    }
+    public int getStupidY() {
+        return stupidY;
+    }
+    public void setStupidY(int stupidXY) {
+        this.stupidY = stupidXY;
+    }
+
+    
     
 
 }

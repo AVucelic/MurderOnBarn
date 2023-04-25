@@ -1,4 +1,5 @@
 import javafx.application.*;
+import javafx.concurrent.Task;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.image.*;
@@ -21,8 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-
-
 /**
  * Game2DClean - The start up for the code
  * 
@@ -36,7 +35,11 @@ public class Game2DClean extends Application {
    private Scene scene;
    private StackPane root;
 
-   private int numTasks =3;
+   private int stopRepeat = 0;
+
+   private Stage taskStage = null;
+
+   private int numTasks = 3;
    private int numCompletedTasks = 0;
 
    private static String[] args;
@@ -97,7 +100,7 @@ public class Game2DClean extends Application {
    private ObjectOutputStream oos = null;
    private Button btnsend = null;
 
-   private Scene newScene =null;
+   private Scene newScene = null;
    private Stage newStage = null;
    private AmongUsSettings settings = new AmongUsSettings();
 
@@ -130,7 +133,6 @@ public class Game2DClean extends Application {
       // initializeScene();
    }
 
-
    // a method that is wehre the player begins and connects to the server
    private void menuSreen() {
       FlowPane root = new FlowPane();
@@ -153,7 +155,6 @@ public class Game2DClean extends Application {
             // getting the command the user want to execture
             Optional<String> valueNext = tid.showAndWait();
             name = valueNext.get();
-
 
             // Make a connection with the server
             try {
@@ -213,7 +214,7 @@ public class Game2DClean extends Application {
             VBox settingsRoot = new VBox();
             xmlSettings.readXML();
             Label lblPortNum = new Label("Port Number:");
-            TextField txtIpNum = new TextField(""+xmlSettings.player.getIpPORT());
+            TextField txtIpNum = new TextField("" + xmlSettings.player.getIpPORT());
 
             Label lblKillCoolDown = new Label("KillCoolDown: ");
             TextField txtKillCoolDown = new TextField("" + xmlSettings.player.getKillCoolDown());
@@ -221,13 +222,14 @@ public class Game2DClean extends Application {
             Label lblKillDis = new Label("KillDistance: ");
             TextField txtKillDistance = new TextField("" + xmlSettings.player.getKillDistance());
 
-            Label lblSpeed= new Label("Speed:");
+            Label lblSpeed = new Label("Speed:");
             TextField txtSpeed = new TextField("" + xmlSettings.player.getPlayerSpeed());
 
             Label lblIpAddres = new Label("Ip Address:");
             TextField txtIpAddress = new TextField("IP" + xmlSettings.player.getServerIP());
 
-            settingsRoot.getChildren().addAll(lblPortNum,txtIpNum,lblKillCoolDown,txtKillCoolDown,lblKillDis,txtKillDistance,lblSpeed,txtSpeed,lblIpAddres,txtIpAddress);
+            settingsRoot.getChildren().addAll(lblPortNum, txtIpNum, lblKillCoolDown, txtKillCoolDown, lblKillDis,
+                  txtKillDistance, lblSpeed, txtSpeed, lblIpAddres, txtIpAddress);
 
             Button btnSave = new Button("Save Changes");
 
@@ -247,21 +249,18 @@ public class Game2DClean extends Application {
                   xmlSettings.player.setServerIP(ipAddress);
                   settingsStage.close();
                }
-               
+
             });
-
-
-            
 
             Scene settingsScene = new Scene(settingsRoot, 400, 300);
             settingsStage.setScene(settingsScene);
             settingsStage.show();
          }
-         
+
       });
 
       VBox top = new VBox();
-      top.getChildren().addAll(btnStart, changeCharacter,btnSettings);
+      top.getChildren().addAll(btnStart, changeCharacter, btnSettings);
       top.setAlignment(Pos.CENTER);
 
       root.getChildren().addAll(top);
@@ -291,7 +290,7 @@ public class Game2DClean extends Application {
          oos.writeObject(CREWMATE_IMAGE);
          oos.flush();
 
-         playerIndex = (int)ois.readObject();
+         playerIndex = (int) ois.readObject();
       } catch (IOException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
@@ -312,17 +311,14 @@ public class Game2DClean extends Application {
             try {
                oos.writeObject("Begin");
                indexOfPlayrInArrayList = (Integer) ois.readObject();
-               playerPoints = (ArrayList<PlayerPoint>)ois.readObject();
+               playerPoints = (ArrayList<PlayerPoint>) ois.readObject();
                for (int i = 0; i < playerPoints.size(); i++) {
-                  if(playerPoints.get(i).getIndex() == indexOfPlayrInArrayList && playerPoints.get(i).isImposter() ){
+                  if (playerPoints.get(i).getIndex() == indexOfPlayrInArrayList && playerPoints.get(i).isImposter()) {
                      isImposter = true;
                   }
-                  
+
                }
-               
 
-
-               
                initializeScene();
             } catch (IOException e) {
                // TODO Auto-generated catch block
@@ -348,41 +344,31 @@ public class Game2DClean extends Application {
 
    }
 
-   
-
    // start the game scene
    public void initializeScene() {
-      
 
       // try {
-      //    socket = new Socket("127.0.0.1", SERVER_PORT);
-      //    ois = new ObjectInputStream(socket.getInputStream());
-      //    oos = new ObjectOutputStream(socket.getOutputStream());
+      // socket = new Socket("127.0.0.1", SERVER_PORT);
+      // ois = new ObjectInputStream(socket.getInputStream());
+      // oos = new ObjectOutputStream(socket.getOutputStream());
       // } catch (IOException e) {
-      //    // TODO Auto-generated catch block
-      //    e.printStackTrace();
+      // // TODO Auto-generated catch block
+      // e.printStackTrace();
       // }
 
-      
       // try {
-      //    oos.writeObject("Begin");
-      //    indexOfPlayrInArrayList = (Integer) ois.readObject();
+      // oos.writeObject("Begin");
+      // indexOfPlayrInArrayList = (Integer) ois.readObject();
       // } catch (ClassNotFoundException e) {
-      //    // TODO Auto-generated catch block
-      //    e.printStackTrace();
+      // // TODO Auto-generated catch block
+      // e.printStackTrace();
       // } catch (IOException e) {
-      //    // TODO Auto-generated catch block
-      //    e.printStackTrace();
+      // // TODO Auto-generated catch block
+      // e.printStackTrace();
       // }
-
-      
 
       root = new StackPane();
       posistion = new Collison();
-
-      
-
-      
 
       // creating a player for a differnt plaeyr to connect to
 
@@ -392,79 +378,73 @@ public class Game2DClean extends Application {
 
       // Adding an interactable object
       Interactable task1 = new Interactable("amongus.png");
+      task1.setStupidX(400);
+      task1.setStupidY(200);
       Interactable task2 = new Interactable("amongus.png");
       task2.moveInteractable(-750, -100);
+      task2.setStupidX(1505);
+      task2.setStupidY(555);
       Interactable task3 = new Interactable("amongus.png");
+      task3.setStupidX(-845);
+      task3.setStupidY(565);
       task3.moveInteractable(1600, -100);
-      EmergencyButton emergencyButton = new EmergencyButton("EmergencyButton.webp");
-      this.root.getChildren().addAll(task1,task2,task3, emergencyButton);
-
-      
-      
+      EmergencyButton emergencyButton = new EmergencyButton("EmergencyButton.png");
+      Interactable task4 = new Interactable("amongus.png");
+      task4.setStupidX(739);
+      task4.setStupidY(-339);
+      task4.moveInteractable(0, 800);
+      this.root.getChildren().addAll(task1, task2, task3, task4, emergencyButton);
 
       // if (indexOfPlayrInArrayList == 0) {
-      //    masterCrewmate = new CrewmateRacer(true, CREWMATE_IMAGE, moveablebackground);
-         
-         
-      //    masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
-      //    onlinePLayer = new CrewmateRacer(false, CREWMATE_IMAGE2);
-      //    onlinePLayer.setLocationOnServer(1);
+      // masterCrewmate = new CrewmateRacer(true, CREWMATE_IMAGE, moveablebackground);
+
+      // masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
+      // onlinePLayer = new CrewmateRacer(false, CREWMATE_IMAGE2);
+      // onlinePLayer.setLocationOnServer(1);
       // } else if (indexOfPlayrInArrayList == 1) {
-      //    masterCrewmate = new CrewmateRacer(false,CREWMATE_IMAGE2 , moveablebackground);
-      //    masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
-      //    onlinePLayer = new CrewmateRacer(true, CREWMATE_IMAGE);
-      //    onlinePLayer.setLocationOnServer(0);
+      // masterCrewmate = new CrewmateRacer(false,CREWMATE_IMAGE2 ,
+      // moveablebackground);
+      // masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
+      // onlinePLayer = new CrewmateRacer(true, CREWMATE_IMAGE);
+      // onlinePLayer.setLocationOnServer(0);
       // }
 
       // try {
-      //    //also telling server if you are imposter or not
-      //    oos.writeObject("addName");
-      //    oos.flush();
-      //    oos.writeObject(masterCrewmate.getName());
-      //    oos.flush();
-      //    oos.writeObject(masterCrewmate.isImposter());
-      //    oos.flush();
+      // //also telling server if you are imposter or not
+      // oos.writeObject("addName");
+      // oos.flush();
+      // oos.writeObject(masterCrewmate.getName());
+      // oos.flush();
+      // oos.writeObject(masterCrewmate.isImposter());
+      // oos.flush();
       // } catch (IOException e) {
-      //    // TODO Auto-generated catch block
-      //    e.printStackTrace();
+      // // TODO Auto-generated catch block
+      // e.printStackTrace();
       // }
 
-      
-
-
-
-      masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE, moveablebackground);
-      // masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
+      // masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE,
+      // moveablebackground);
+      masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
 
       masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
+      masterCrewmate.setName(name);
       otherCrewmates.add(masterCrewmate);
 
       for (int i = 0; i < playerPoints.size(); i++) {
-         if(playerPoints.get(i).getIndex() != indexOfPlayrInArrayList){
-            CrewmateRacer temp = new CrewmateRacer(playerPoints.get(i).isImposter(), playerPoints.get(i).getImageName());
+         if (playerPoints.get(i).getIndex() != indexOfPlayrInArrayList) {
+            CrewmateRacer temp = new CrewmateRacer(playerPoints.get(i).isImposter(),
+                  playerPoints.get(i).getImageName());
             temp.setName(playerPoints.get(i).getName());
             temp.setLocationOnServer(playerPoints.get(i).getIndex());
             otherCrewmates.add(temp);
             this.root.getChildren().addAll(temp);
 
          }
-         
+
       }
-
-
-
-
-
-
 
       // otherCrewmates.add(onlinePLayer);
       // this.root.getChildren().addAll(onlinePLayer);
-      
-
-
-
-
-
 
       // needs to be added last
       this.root.getChildren().add(masterCrewmate);
@@ -563,11 +543,11 @@ public class Game2DClean extends Application {
       // updating the posistion of player each frame
 
       // This is the thread for other player movement and updating their psositons
-      for(int i = 0; i<otherCrewmates.size(); i++){
-         if(otherCrewmates.get(i).getLocationOnServer() != indexOfPlayrInArrayList){
+      for (int i = 0; i < otherCrewmates.size(); i++) {
+         if (otherCrewmates.get(i).getLocationOnServer() != indexOfPlayrInArrayList) {
             otherCrewmates.get(i).update(-1930, -160);
          }
-         
+
       }
       // recveing thread
       Timer reciver = new Timer();
@@ -581,111 +561,116 @@ public class Game2DClean extends Application {
                   String command = (String) obj;
                   switch (command) {
                      case "changeSpeed":
-                        moveablebackground.setSpeed((int)ois.readObject());
+                        moveablebackground.setSpeed((int) ois.readObject());
                         break;
                      case "newplayer":
                         break;
                      case "move":
-                        int size = (int)ois.readObject();
+                        int size = (int) ois.readObject();
                         ArrayList<PlayerPoint> oldLocations = new ArrayList<>();
                         for (int i = 0; i < size; i++) {
-                           PlayerPoint player = (PlayerPoint)ois.readObject();
+                           PlayerPoint player = (PlayerPoint) ois.readObject();
                            oldLocations.add(player);
                         }
-                        //ArrayList<PlayerPoint> oldLocations = (ArrayList<PlayerPoint>) ois.readObject();
-                    
+                        // ArrayList<PlayerPoint> oldLocations = (ArrayList<PlayerPoint>)
+                        // ois.readObject();
+
                         for (int i = 0; i < oldLocations.size(); i++) {
-                           System.out.println(oldLocations.get(i).getIndex() + " old X: " + oldLocations.get(i).getX() + " old Y " + oldLocations.get(i).getY());
+                           System.out.println(oldLocations.get(i).getIndex() + " old X: " + oldLocations.get(i).getX()
+                                 + " old Y " + oldLocations.get(i).getY());
 
                            int index = oldLocations.get(i).getIndex();
-                           //System.out.println("Mastercrewmate INdex: "+masterCrewmate.getLocationOnServer());
-                           for(int y =0; y<otherCrewmates.size();y++){
+                           // System.out.println("Mastercrewmate INdex:
+                           // "+masterCrewmate.getLocationOnServer());
+                           for (int y = 0; y < otherCrewmates.size(); y++) {
                               // System.out.println(otherCrewmates.get(y).getLocationOnServer());
                               // System.out.println(index);
-                              if(otherCrewmates.get(y).getLocationOnServer() == index && 
-                              otherCrewmates.get(y).getLocationOnServer() != masterCrewmate.getLocationOnServer() ){
-                                 // System.out.println("THe index that is modfied: "  + index);
+                              if (otherCrewmates.get(y).getLocationOnServer() == index &&
+                                    otherCrewmates.get(y).getLocationOnServer() != masterCrewmate
+                                          .getLocationOnServer()) {
+                                 // System.out.println("THe index that is modfied: " + index);
                                  int changeInX = (int) oldLocations.get(i).getX() - masterCrewmate.getBackgroundPosX();
                                  int changeInY = (int) oldLocations.get(i).getY() - masterCrewmate.getBackgroundPosY();
                                  otherCrewmates.get(y).updateOnline(-changeInX, -changeInY);
                                  // System.out.println("Chnage other crewmates posistion");
                               }
                            }
-                           
-                           
+
                         }
                         break;
                      case "meeting":
-                        masterCrewmate.meeting();
-                        Platform.runLater(() -> {
-                           chatbox.setText("");
-                           message.setText("");
-                           newStage = new Stage();
-                           VBox root = new VBox(10);
+                        if (stopRepeat == 0) {
+                           masterCrewmate.meeting();
+                           Platform.runLater(() -> {
+                              chatbox.setText("");
+                              message.setText("");
+                              newStage = new Stage();
+                              VBox root = new VBox(10);
 
-                           FlowPane middle = new FlowPane();
-                           btnsend = new Button("Send");
-                           
-                           btnsend.setOnAction(new EventHandler<ActionEvent>() {
+                              FlowPane middle = new FlowPane();
+                              btnsend = new Button("Send");
 
-                              @Override
-                              public void handle(ActionEvent event) {
-                                 String line = masterCrewmate.getName() + message.getText() + "\n";
-                                 //chatbox.appendText("User: " + line + "\n");
-                                 try {
-                                    oos.writeObject("Chat");
-                                    oos.writeObject(line);
-                                    oos.flush();
-                                 } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                              btnsend.setOnAction(new EventHandler<ActionEvent>() {
+
+                                 @Override
+                                 public void handle(ActionEvent event) {
+                                    String line = masterCrewmate.getName() + message.getText() + "\n";
+                                    // chatbox.appendText("User: " + line + "\n");
+                                    try {
+                                       oos.writeObject("Chat");
+                                       oos.writeObject(line);
+                                       oos.flush();
+                                    } catch (IOException e) {
+                                       // TODO Auto-generated catch block
+                                       e.printStackTrace();
+                                    }
+
                                  }
 
-                              }
+                              });
 
-                           });
+                              Button btnVote = new Button("Vote");
+                              btnVote.setOnAction(new EventHandler<ActionEvent>() {
 
-                           Button btnVote = new Button("Vote");
-                           btnVote.setOnAction(new EventHandler<ActionEvent>() {
+                                 @Override
+                                 public void handle(ActionEvent event) {
+                                    String line = message.getText();
 
-                              @Override
-                              public void handle(ActionEvent event) {
-                                 String line = message.getText();
+                                    try {
+                                       oos.writeObject("Vote");
+                                       oos.flush();
+                                       oos.writeObject(line);
+                                       oos.flush();
+                                    } catch (IOException e) {
+                                       // TODO Auto-generated catch block
+                                       e.printStackTrace();
+                                    }
+                                    btnVote.setDisable(true);
 
-                                 try {
-                                    oos.writeObject("Vote");
-                                    oos.flush();
-                                    oos.writeObject(line);
-                                    oos.flush();
-                                 } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
                                  }
-                                 btnVote.setDisable(true);
-                                 
-                                 
-                              }
-                              
+
+                              });
+                              middle.getChildren().addAll(message, btnsend, btnVote);
+
+                              root.getChildren().addAll(chatbox, middle);
+                              // create the new scene to be displayed
+                              newScene = new Scene(root, 400, 300);
+
+                              // set the scene of the new stage
+                              newStage.setScene(newScene);
+
+                              // set the title of the new stage
+                              newStage.setTitle(
+                                    "Chat for " + masterCrewmate.getName() + " "
+                                          + masterCrewmate.getLocationOnServer());
+
+                              // show the new stage
+                              newStage.show();
+                              stopRepeat++;
+                              // configure and show the new stage here
                            });
-                           middle.getChildren().addAll(message, btnsend,btnVote);
-
-                           root.getChildren().addAll(chatbox, middle);
-                           // create the new scene to be displayed
-                           newScene = new Scene(root, 400, 300);
-
-                           // set the scene of the new stage
-                           newStage.setScene(newScene);
-
-                           // set the title of the new stage
-                           newStage.setTitle(
-                                 "Chat for " + masterCrewmate.getName() + " " + masterCrewmate.getLocationOnServer());
-
-                           // show the new stage
-                           newStage.show();
-                           // configure and show the new stage here
-                        });
-                        // create the new stage
-
+                           // create the new stage
+                        }
                         break;
                      case "addmessage":
 
@@ -702,13 +687,16 @@ public class Game2DClean extends Application {
 
                         break;
                      case "endmeeting":
-                        PlayerPoint playerVotedOff = (PlayerPoint)ois.readObject();
-                        
+                        stopRepeat = 0;
+                        PlayerPoint playerVotedOff = (PlayerPoint) ois.readObject();
+
                         Platform.runLater(new Runnable() {
 
                            @Override
                            public void run() {
-                              String message = playerVotedOff.getName() + "was voted off with this many votes " + playerVotedOff.getNumVotes() + " and player is Imposter:" + playerVotedOff.isImposter();
+                              String message = playerVotedOff.getName() + "was voted off with this many votes "
+                                    + playerVotedOff.getNumVotes() + " and player is Imposter:"
+                                    + playerVotedOff.isImposter();
                               Alert alert = new Alert(AlertType.CONFIRMATION, message);
                               alert.setHeaderText("Player voted off");
                               alert.showAndWait();
@@ -717,32 +705,30 @@ public class Game2DClean extends Application {
 
                         });
                         for (int i = 0; i < otherCrewmates.size(); i++) {
-                           if(otherCrewmates.get(i).getLocationOnServer() == playerVotedOff.getIndex()){
+                           if (otherCrewmates.get(i).getLocationOnServer() == playerVotedOff.getIndex()) {
                               otherCrewmates.get(i).setAlive(false);
                               System.out.println(otherCrewmates.get(i).getName() + " was voted off and killed");
                            }
-                           
-                        }
 
-                        
+                        }
 
                         break;
                      case "dead":
-                        PlayerPoint deadCrewmate = (PlayerPoint)ois.readObject();
+                        PlayerPoint deadCrewmate = (PlayerPoint) ois.readObject();
                         for (int i = 0; i < otherCrewmates.size(); i++) {
-                           if(otherCrewmates.get(i).getLocationOnServer() == deadCrewmate.getIndex()){
+                           if (otherCrewmates.get(i).getLocationOnServer() == deadCrewmate.getIndex()) {
                               System.out.println("This player has dead " + otherCrewmates.get(i).getName());
                               otherCrewmates.get(i).setAlive(false);
-                              
-                              if(masterCrewmate.getLocationOnServer() == deadCrewmate.getIndex()){
+
+                              if (masterCrewmate.getLocationOnServer() == deadCrewmate.getIndex()) {
                                  System.out.println("You have died");
-                              }else{
-                                 //this player is not killing the other player but instead on this players
-                                 //screen amking them look dead 
+                              } else {
+                                 // this player is not killing the other player but instead on this players
+                                 // screen amking them look dead
                                  masterCrewmate.kill(otherCrewmates.get(i));
                               }
                            }
-                           
+
                         }
                         break;
                      case "impostersWin":
@@ -752,18 +738,19 @@ public class Game2DClean extends Application {
                            public void run() {
                               Alert alert = new Alert(AlertType.INFORMATION, "The imposters win");
                               alert.showAndWait();
-                              
+
                            }
-                           
+
                         });
-                        
+
                         break;
                   }
 
                } else if (obj instanceof PlayerPoint) {
                   PlayerPoint backgroundPos = (PlayerPoint) obj;
-                  // System.out.println("Other player background pos: " + " X " + backgroundPos.getX() + " Y "
-                  //             + backgroundPos.getY());
+                  // System.out.println("Other player background pos: " + " X " +
+                  // backgroundPos.getX() + " Y "
+                  // + backgroundPos.getY());
                   int index = (int) ois.readObject();
                   int numPlayers = (int) ois.readObject();
                   for (int i = 0; i < otherCrewmates.size(); i++) {
@@ -773,12 +760,15 @@ public class Game2DClean extends Application {
                      if (index == otherCrewmates.get(i).getLocationOnServer()) {
                         int changeInX = (int) backgroundPos.getX() - masterCrewmate.getBackgroundPosX();
                         int changeInY = (int) backgroundPos.getY() - masterCrewmate.getBackgroundPosY();
-                        // System.out.println("Other player background pos: " + " X " + backgroundPos.getX() + " Y "
-                        //       + backgroundPos.getY());
-                        // System.out.println("This player background pos: " + " X " + masterCrewmate.getBackgroundPosX()
-                        //       + " Y " + masterCrewmate.getBackgroundPosY());
-                        // System.out.println(otherCrewmates.get(i).getName() + "change in X coord: " + changeInX
-                        //       + "change in Y coord:" + changeInY + "\n\n\n\n\n\n\n\n");
+                        // System.out.println("Other player background pos: " + " X " +
+                        // backgroundPos.getX() + " Y "
+                        // + backgroundPos.getY());
+                        // System.out.println("This player background pos: " + " X " +
+                        // masterCrewmate.getBackgroundPosX()
+                        // + " Y " + masterCrewmate.getBackgroundPosY());
+                        // System.out.println(otherCrewmates.get(i).getName() + "change in X coord: " +
+                        // changeInX
+                        // + "change in Y coord:" + changeInY + "\n\n\n\n\n\n\n\n");
                         otherCrewmates.get(i).updateOnline(-changeInX, -changeInY);
                      }
                   }
@@ -796,8 +786,6 @@ public class Game2DClean extends Application {
       };
       reciver.scheduleAtFixedRate(recivingInfo, 10, 50);
 
-      
-
       timer = new AnimationTimer() {
          long startTime = System.nanoTime();
          int frameCount = 0;
@@ -814,13 +802,13 @@ public class Game2DClean extends Application {
             // Calculate FPS if one second has elapsed
             if (elapsedTime >= 1_000_000_000) {
                double fps = frameCount / (elapsedTime / 1_000_000_000.0);
-               //System.out.println("FPS: " + fps);
+               // System.out.println("FPS: " + fps);
 
                // Reset start time and frame count
                startTime = now;
                frameCount = 0;
                // delay this
-               
+
             }
 
             Point2D location = moveablebackground.update(moveDown, moveUp, moveLeft, moveRight);
@@ -828,18 +816,16 @@ public class Game2DClean extends Application {
             masterCrewmate.setBackgroundPosY(moveablebackground.getBackgroundPosY());
             if (moveDown || moveUp || moveLeft || moveRight) {
                // send new posistion to server
-
+               masterCrewmate.update(location.getX(), location.getY());
                // sending the background coordinates with its index to the server
                try {
-                  if(masterCrewmate.isAlive()){
+                  if (masterCrewmate.isAlive()) {
                      oos.writeObject(new PlayerPoint(masterCrewmate.getBackgroundPosX(),
-                        masterCrewmate.getBackgroundPosY(), masterCrewmate.getLocationOnServer()));
-                        oos.flush();
+                           masterCrewmate.getBackgroundPosY(), masterCrewmate.getLocationOnServer()));
+                     oos.flush();
                   }
-                 
-                  
 
-                  //asking for other players old locations 
+                  // asking for other players old locations
                   oos.writeObject("move");
                   oos.flush();
 
@@ -848,8 +834,6 @@ public class Game2DClean extends Application {
                   e.printStackTrace();
                }
 
-
-
                // onlinePLayer.update(location.getX(), location.getY());
 
             }
@@ -857,21 +841,18 @@ public class Game2DClean extends Application {
             task1.update(location.getX(), location.getY());
             task2.update(location.getX(), location.getY());
             task3.update(location.getX(), location.getY());
-
+            task4.update(location.getX(), location.getY());
 
             emergencyButton.update(location.getX(), location.getY());
-
-            
 
             // otherCrewmates.get(0).update(location.getX(), location.getY());
             // to detect the distance between a player and a task
 
+            // allowing one to get the report button when they are close
+            // to the emergency button or when they are close a dead crewmate
 
-            //allowing one to get the report button  when they are close
-            //to the emergency button or when they are close a dead crewmate
-
-            //for normal crewmates tasks 
-            if(!masterCrewmate.isImposter()){
+            // for normal crewmates tasks
+            if (!masterCrewmate.isImposter()) {
                if (checkDistance(masterCrewmate, task1)) {
                   synchronized (masterCrewmate) {
 
@@ -880,7 +861,7 @@ public class Game2DClean extends Application {
                      // task.addHighlight();
 
                   }
-               } else if(checkDistance(masterCrewmate, task2)){
+               } else if (checkDistance(masterCrewmate, task2)) {
                   synchronized (masterCrewmate) {
 
                      masterCrewmate.getBtnUse().setDisable(false);
@@ -889,7 +870,7 @@ public class Game2DClean extends Application {
 
                   }
 
-               }else if(checkDistance(masterCrewmate, task3)){
+               } else if (checkDistance(masterCrewmate, task3)) {
                   synchronized (masterCrewmate) {
 
                      masterCrewmate.getBtnUse().setDisable(false);
@@ -897,113 +878,195 @@ public class Game2DClean extends Application {
                      // task.addHighlight();
 
                   }
-                  
-               }else {
+
+               } else if (checkDistance(masterCrewmate, task4)) {
+                  synchronized (masterCrewmate) {
+
+                     masterCrewmate.getBtnUse().setDisable(false);
+                     masterCrewmate.setToUse("Task 4");
+                     // task.addHighlight();
+
+                  }
+
+               } else {
                   masterCrewmate.getBtnUse().setDisable(true);
                }
 
+               if (masterCrewmate.getBtnUse().isPressed()) {
 
+                  taskStage = new Stage();
 
-               if(masterCrewmate.getBtnUse().isPressed()){
-                  Stage tempStage = new Stage();
-                  
-                  if(masterCrewmate.getToUse().equals("Task 1")){
+                  if (masterCrewmate.getToUse().equals("Task 1")) {
                      TaskWires task = new TaskWires();
-                     tempStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                     taskStage.setOnHiding(new EventHandler<WindowEvent>() {
 
                         @Override
                         public void handle(WindowEvent event) {
-                           if(task.isCompleted()){
+                           if (task.isCompleted()) {
                               try {
                                  oos.writeObject("addTask");
+                                 oos.flush();
                               } catch (IOException e) {
                                  // TODO Auto-generated catch block
                                  e.printStackTrace();
                               }
                               numCompletedTasks++;
-                              double total = (double)numCompletedTasks/numTasks;
+                              double total = (double) numCompletedTasks / numTasks;
                               Platform.runLater(new Runnable() {
 
                                  @Override
                                  public void run() {
                                     masterCrewmate.getProgressBar().setProgress(total);
                                  }
-                                 
+
                               });
                            }
+                           stopRepeat = 0;
                         }
-                        
+
                      });
                      try {
-                        task.start(tempStage);
-                        
+                        if (stopRepeat == 0) {
+                           task.start(taskStage);
+                           stopRepeat++;
+                        }
+
                      } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                      }
-                  }else if(masterCrewmate.getToUse().equals("Task 2")){
+                  } else if (masterCrewmate.getToUse().equals("Task 2")) {
                      TaskDownload task = new TaskDownload();
-                     tempStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                     taskStage.setOnHiding(new EventHandler<WindowEvent>() {
 
                         @Override
                         public void handle(WindowEvent event) {
-                           if(task.isCompleted()){
+                           if (task.isCompleted()) {
                               try {
                                  oos.writeObject("addTask");
+                                 oos.flush();
                               } catch (IOException e) {
                                  // TODO Auto-generated catch block
                                  e.printStackTrace();
                               }
                               numCompletedTasks++;
-                              double total = (double)numCompletedTasks/numTasks;
+                              double total = (double) numCompletedTasks / numTasks;
                               Platform.runLater(new Runnable() {
 
                                  @Override
                                  public void run() {
                                     masterCrewmate.getProgressBar().setProgress(total);
                                  }
-                                 
+
                               });
                            }
+                           stopRepeat = 0;
                         }
-                        
+
                      });
                      try {
-                        task.start(tempStage);
-                        
+                        if (stopRepeat == 0) {
+                           task.start(taskStage);
+                           stopRepeat++;
+                        }
+
                      } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                      }
-                  }else if(masterCrewmate.getToUse().equals("Task 3")){
+                  } else if (masterCrewmate.getToUse().equals("Task 3")) {
+                     TaskSum task = new TaskSum();
+                     taskStage.setOnHiding(new EventHandler<WindowEvent>() {
+
+                        @Override
+                        public void handle(WindowEvent event) {
+                           if (task.isCompleted()) {
+                              try {
+                                 oos.writeObject("addTask");
+                                 oos.flush();
+                              } catch (IOException e) {
+                                 // TODO Auto-generated catch block
+                                 e.printStackTrace();
+                              }
+                              numCompletedTasks++;
+                              double total = (double) numCompletedTasks / numTasks;
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    masterCrewmate.getProgressBar().setProgress(total);
+                                 }
+
+                              });
+                           }
+                           stopRepeat = 0;
+                        }
+
+                     });
+                     try {
+                        if (stopRepeat == 0) {
+                           task.start(taskStage);
+                           stopRepeat++;
+                        }
+                     } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                     }
+
+                  } else if (masterCrewmate.getToUse().equals("Task 4")) {
+                     SwipeCardTask task = new SwipeCardTask();
+                     taskStage.setOnHiding(new EventHandler<WindowEvent>() {
+
+                        @Override
+                        public void handle(WindowEvent event) {
+                           if (task.isCompleted()) {
+                              try {
+                                 oos.writeObject("addTask");
+                                 oos.flush();
+                              } catch (IOException e) {
+                                 // TODO Auto-generated catch block
+                                 e.printStackTrace();
+                              }
+                              numCompletedTasks++;
+                              double total = (double) numCompletedTasks / numTasks;
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    masterCrewmate.getProgressBar().setProgress(total);
+                                 }
+
+                              });
+                           }
+                           stopRepeat = 0;
+                        }
+
+                     });
+                     try {
+                        if (stopRepeat == 0) {
+                           task.start(taskStage);
+                           stopRepeat++;
+                        }
+                     } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                     }
 
                   }
-                  
-                  
+
                }
             }
 
-            
-
-
-            //for reproting or emergency button
+            // for reproting or emergency button
             if (emergencyButton.distanceEmgButton(masterCrewmate) || check()) {
                synchronized (masterCrewmate) {
                   masterCrewmate.getBtnReport().setDisable(false);
                   // task.addHighlight();
                }
                masterCrewmate.setToUse("Emergency");
-            }else{
+            } else {
                masterCrewmate.getBtnReport().setDisable(true);
             }
-
-            
-            
-
-
-
-
-
 
             if (masterCrewmate.getBtnReport().isPressed()) {
                if (masterCrewmate.getToUse().equals("Emergency")) {
@@ -1017,25 +1080,21 @@ public class Game2DClean extends Application {
                }
             }
 
-
-
-            if(masterCrewmate.isImposter()){
+            if (masterCrewmate.isImposter()) {
                CrewmateRacer killable = null;
                for (int i = 0; i < otherCrewmates.size(); i++) {
-                  if(masterCrewmate.getLocationOnServer() != otherCrewmates.get(i).getLocationOnServer()){
-                     if(CrewmateRacer.checkDistance(masterCrewmate, otherCrewmates.get(i))){
+                  if (masterCrewmate.getLocationOnServer() != otherCrewmates.get(i).getLocationOnServer()) {
+                     if (CrewmateRacer.checkDistance(masterCrewmate, otherCrewmates.get(i))) {
                         masterCrewmate.getBtnKill().setDisable(false);
                         killable = otherCrewmates.get(i);
-                     }else{
+                     } else {
                         masterCrewmate.getBtnKill().setDisable(true);
                      }
                   }
 
-                  
-                  
                }
 
-               if(masterCrewmate.getBtnKill().isPressed()){
+               if (masterCrewmate.getBtnKill().isPressed()) {
                   masterCrewmate.kill(killable);
                   try {
                      oos.writeObject("kill");
@@ -1046,14 +1105,14 @@ public class Game2DClean extends Application {
                      // TODO Auto-generated catch block
                      e.printStackTrace();
                   }
-                  
+
                }
 
-               if(masterCrewmate.getBtnSabatoage().isPressed()){
+               if (masterCrewmate.getBtnSabatoage().isPressed()) {
                   try {
                      oos.writeObject("sabtoge");
                      oos.flush();
-                     oos.writeObject(moveablebackground.getSpeed()/2);
+                     oos.writeObject(moveablebackground.getSpeed() / 2);
                      oos.flush();
                      Timer slow = new Timer();
                      TimerTask slowLimit = new TimerTask() {
@@ -1063,29 +1122,26 @@ public class Game2DClean extends Application {
                            try {
                               oos.writeObject("sabtoge");
                               oos.flush();
-                              oos.writeObject(moveablebackground.getSpeed()*2);
+                              oos.writeObject(moveablebackground.getSpeed() * 2);
                               oos.flush();
                            } catch (IOException e) {
                               // TODO Auto-generated catch block
                               e.printStackTrace();
                            }
-                     
+
                         }
-                        
+
                      };
                      slow.schedule(slowLimit, 10000);
-                     
+
                   } catch (IOException e) {
                      // TODO Auto-generated catch block
                      e.printStackTrace();
                   }
-                  
+
                }
 
             }
-
-
-            
 
          }
 
@@ -1099,8 +1155,8 @@ public class Game2DClean extends Application {
       double xDis = 0;
       double yDis = 0;
       synchronized (masterCrewmate) {
-         xDis = Math.pow(crewmate.getRacerPosX() - task.getPosXBasedOnBack(), 2);
-         yDis = Math.pow(crewmate.getRacerPosY() - task.getPosYBasedOnBack(), 2);
+         xDis = Math.pow(crewmate.getRacerPosX() - task.getStupidX(), 2);
+         yDis = Math.pow(crewmate.getRacerPosY() - task.getStupidY(), 2);
       }
       double distance = Math.sqrt(xDis + yDis);
       // System.out.println("Distance between " + task.getName() + " and players
@@ -1113,15 +1169,15 @@ public class Game2DClean extends Application {
       }
    }
 
-   public boolean check(){
+   public boolean check() {
       for (int i = 0; i < otherCrewmates.size(); i++) {
-         if(otherCrewmates.get(i).getLocationOnServer() != masterCrewmate.getLocationOnServer()){
-            if(CrewmateRacer.checkDistance(masterCrewmate, otherCrewmates.get(i))){
-               if(!otherCrewmates.get(i).isAlive()){
+         if (otherCrewmates.get(i).getLocationOnServer() != masterCrewmate.getLocationOnServer()) {
+            if (CrewmateRacer.checkDistance(masterCrewmate, otherCrewmates.get(i))) {
+               if (!otherCrewmates.get(i).isAlive()) {
                   return true;
                }
             }
-         }else{
+         } else {
             return false;
          }
       }

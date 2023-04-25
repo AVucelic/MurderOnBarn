@@ -357,19 +357,20 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                                  outputStreams.get(i).flush();
 
                               }
+                              if(endGame() == 1){
+                                 for (int i = 0; i < outputStreams.size(); i++) {
+                                    outputStreams.get(i).writeObject("impostersWin");
+                                    outputStreams.get(i).flush();
+                                 }
+                              }else if(endGame() == 0){
+                                 for (int i = 0; i < outputStreams.size(); i++) {
+                                    outputStreams.get(i).writeObject("playersWin");
+                                    outputStreams.get(i).flush();
+                                 }
+                              }
                            }
 
-                           if(endGame() == 1){
-                              for (int i = 0; i < outputStreams.size(); i++) {
-                                 outputStreams.get(i).writeObject("impostersWin");
-                                 outputStreams.get(i).flush();
-                              }
-                           }else if(endGame() == 0){
-                              for (int i = 0; i < outputStreams.size(); i++) {
-                                 outputStreams.get(i).writeObject("playersWin");
-                                 outputStreams.get(i).flush();
-                              }
-                           }
+                           
                         } catch (ClassNotFoundException e) {
                            // TODO Auto-generated catch block
                            e.printStackTrace();

@@ -107,8 +107,8 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
       racerPosY = (int)y + 160 + STARTING_Y - 25;
       //System.out.println("Background " +name + " X Cord " + xForInter);
       //System.out.println("Background " + name + " Y Cord " + yForInter);
-      aPicView.setTranslateX(racerPosX);
-      aPicView.setTranslateY(racerPosY);
+      // aPicView.setTranslateX(racerPosX);
+      // aPicView.setTranslateY(racerPosY);
 
       //System.out.println("Moving other player with main player pos: " + " X " + racerPosX  +" Y "+ racerPosY);
 
