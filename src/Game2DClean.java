@@ -1,25 +1,16 @@
 import javafx.application.*;
-import javafx.concurrent.Task;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.image.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.*;
-import javafx.scene.effect.Light.Point;
-import javafx.scene.text.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
 import javafx.stage.*;
-import javafx.util.Duration;
 import javafx.geometry.*;
 import javafx.animation.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
-
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**

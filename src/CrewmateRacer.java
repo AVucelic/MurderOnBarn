@@ -1,18 +1,11 @@
 import java.io.Serializable;
-
-import javax.swing.Action;
-
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -21,6 +14,7 @@ import javafx.scene.layout.StackPane;
 /**
  * CrewmateRacer - a class to make players for the game
  * @author Luka Lasic
+ * @author Arian Vucelic
  * @since 20-4-2023
  * 
  * 

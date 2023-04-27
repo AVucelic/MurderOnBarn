@@ -1,15 +1,11 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
-
-import javax.xml.stream.Location;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.effect.Light.Point;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 import javafx.geometry.*;
