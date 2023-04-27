@@ -3,7 +3,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-
+/**
+ * MovableBackground - a class that is meant to serve as the moveable background for the main player
+ * @author Luka Lasic
+ * @since 20-4-2023
+ */
 public class MovableBackground extends Pane {
    // strating postion of racer in pxiels based on top left corner
    // and correlates to the window
@@ -39,6 +43,11 @@ public class MovableBackground extends Pane {
     */
    private TrackMovement tm = new TrackMovement();
 
+   /**
+    * setting the players movable background based of given string 
+    * @param MASK_IMAGE
+    * @param BACKGROUND_IMAGE
+    */
    public MovableBackground(String MASK_IMAGE, String BACKGROUND_IMAGE) {
       xmlWorker.readXML();
       
@@ -59,6 +68,15 @@ public class MovableBackground extends Pane {
 
    }
 
+   
+   /** 
+    * update a method to move the background postion while also checking for collsion and returing the point where the player should move
+    * @param moveDown
+    * @param moveUp
+    * @param moveLeft
+    * @param moveRight
+    * @return Point2D
+    */
    public Point2D update(boolean moveDown, boolean moveUp, boolean moveLeft, boolean moveRight) {
       int oldBackgroundPosX = backgroundPosX;
       int oldBackgroundPosY = backgroundPosY;
@@ -84,12 +102,14 @@ public class MovableBackground extends Pane {
       // to make sure the color reader does not create an error
       // due to putting in a negative number
       // also to make sure the color checker is correct when player postion is postive
-      //System.out.println("Befroe Alter: Background image X Cord " + backgroundPosX);
-      //System.out.println("Befroe Alter: Background image Y Cord " + backgroundPosY);
+
+      //getting if the posisiotin is correct 
       Collison posistion = collison.checkingCollison(this, backgroundCollison,
             playerPosistionX,
             playerPosistionY, backgroundPosX, backgroundPosY);
 
+
+      //if there is any collsion make sure to adjust player x and y 
       if (posistion.isCollided()) {
          int adjustX = (int) posistion.getChangePoint().getX();
          int adjustY = (int) posistion.getChangePoint().getY();
@@ -107,6 +127,8 @@ public class MovableBackground extends Pane {
          }
       }
 
+
+      //moving the two background images
       aPicView.setTranslateX(backgroundPosX);
       aPicView.setTranslateY(backgroundPosY);
       aPicView2.setTranslateX(backgroundPosX);
@@ -119,7 +141,7 @@ public class MovableBackground extends Pane {
 
       //System.out.println("Players X Cord " + playerPosistionX);
       //System.out.println("PLayers Y Cord " + playerPosistionY);
-      color = backgroundCollison.getPixelReader().getColor(playerPosistionX, playerPosistionY);
+      //color = backgroundCollison.getPixelReader().getColor(playerPosistionX, playerPosistionY);
       //System.out.println("r: " + color.getRed() + ",g:" + color.getGreen() + ",b:" + color.getBlue());
 
       //Returning the players background postion 
@@ -138,59 +160,119 @@ public class MovableBackground extends Pane {
    }
 
 
+   
+   /** 
+    * @param backgroundPosX
+    */
    public void setBackgroundPosX(int backgroundPosX) {
        this.backgroundPosX = backgroundPosX;
    }
+   
+   /** 
+    * @param backgroundPosY
+    */
    public void setBackgroundPosY(int backgroundPosY) {
        this.backgroundPosY = backgroundPosY;
    }
+   
+   /** 
+    * @return int
+    */
    public int getBackgroundPosX() {
        return backgroundPosX;
    }
+   
+   /** 
+    * @return int
+    */
    public int getBackgroundPosY() {
        return backgroundPosY;
    }
 
+   
+   /** 
+    * @return ImageView
+    */
    public ImageView getAPicView() {
       return aPicView;
    }
 
+   
+   /** 
+    * @param speed
+    */
    public void setSpeed(int speed) {
       this.speed = speed;
    }
 
+   
+   /** 
+    * @return int
+    */
    public int getSpeed() {
       return speed;
    }
 
+   
+   /** 
+    * @return int
+    */
    public int getPlayerPosistionX() {
       return playerPosistionX;
    }
 
+   
+   /** 
+    * @return int
+    */
    public int getPlayerPosistionY() {
       return playerPosistionY;
    }
 
+   
+   /** 
+    * @param playerPosistionX
+    */
    public void setPlayerPosistionX(int playerPosistionX) {
       this.playerPosistionX = playerPosistionX;
    }
 
+   
+   /** 
+    * @param playerPosistionY
+    */
    public void setPlayerPosistionY(int playerPosistionY) {
       this.playerPosistionY = playerPosistionY;
    }
 
+   
+   /** 
+    * @return int
+    */
    public int getPlayerX() {
       return playerX;
    }
 
+   
+   /** 
+    * @param playerX
+    */
    public void setPlayerX(int playerX) {
       this.playerX = playerX;
    }
 
+   
+   /** 
+    * @return int
+    */
    public int getPlayerY() {
       return playerY;
    }
 
+   
+   /** 
+    * @param playerY
+    */
    public void setPlayerY(int playerY) {
       this.playerY = playerY;
    }

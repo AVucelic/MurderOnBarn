@@ -10,6 +10,10 @@ public class TaskClickImage {
     private int onCount = 0;
     public int points;
 
+    
+    /** 
+     * @param points
+     */
     public void SwitchChange(int points){
         this.points = points;
         onCount = onCount + points;

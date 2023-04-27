@@ -25,9 +25,10 @@ import javafx.scene.input.KeyEvent;
 /**
  * Game2DClean - The start up for the code
  * 
- * @author Luka Lasic
+ * @author Luka Lasic 
+ * @author Arain Vueclic 
  * @since 25-3-2023
- * @version 0.5
+ * @version 1.0
  */
 public class Game2DClean extends Application {
    // Window attributes
@@ -35,38 +36,53 @@ public class Game2DClean extends Application {
    private Scene scene;
    private StackPane root;
 
+
+   //atr to stop multiple popups from comming up 
    private int stopRepeat = 0;
 
+
+   //stage for the tasks
    private Stage taskStage = null;
 
-   private int numTasks = 3;
+
+   //number of taks a player needs to do 
+   private int numTasks = 4;
    private int numCompletedTasks = 0;
 
    private static String[] args;
 
+
+   //default skin for a player
    private String CREWMATE_IMAGE = "cow.png"; // file with icon for a racer for this specefic user
 
    private final static String CREWMATE_IMAGE2 = "duck.png";
 
    private final static String CREWMATE_RUNNERS = "amongusRunners.png"; // file with icon for a racer
 
+
+   //mask image for reading collsion
+
    private final static String MASK_IMAGE = "mask2.png";
 
-   // private final static String MASK_IMAGE_SVG = "mask2.svg";
-
+   //background iamge for the entire page
    private final static String BACKGROUND_IMAGE = "map.png";
 
+
+   //the size of the window 
    private final static int WIDTH_OF_SCREEN = 800;
    private final static int HEIGHT_OF_SCREEN = 500;
-   // cirlce meant to act as collison for character, or bounding circle
-   private Circle collisonCircle = new Circle(35.35);
+  
 
-   // Crewmaes
+   //this player crewmate 
    CrewmateRacer masterCrewmate = null;
    CrewmateRacer onlinePLayer = null;
 
+
+   //arraylist of othercrewmates
    private ArrayList<CrewmateRacer> otherCrewmates = new ArrayList<>();
 
+
+   //all th eplayer points from the server
    private ArrayList<PlayerPoint> playerPoints = null;
 
    // moavebale background
@@ -76,6 +92,8 @@ public class Game2DClean extends Application {
    AnimationTimer timer = null;
    int counter = 0;
 
+
+   //movement detection atr 
    boolean moveUp = false;
    boolean moveDown = false;
    boolean moveRight = false;
@@ -84,12 +102,16 @@ public class Game2DClean extends Application {
    // background /detection/collison
    Image backgroundCollison = null;
    private Collison posistion;
+
+   //tracking which input keys are being put in
    private TrackMovement tm = new TrackMovement();
 
-   private TextArea chatbox = new TextArea();
 
+   //for the chat 
+   private TextArea chatbox = new TextArea();
    private TextField message = new TextField();
 
+   //what the players index is on the server 
    private Integer indexOfPlayrInArrayList;
    // general SOCKET attributes
    public static final int SERVER_PORT = 32001;
@@ -100,43 +122,60 @@ public class Game2DClean extends Application {
    private ObjectOutputStream oos = null;
    private Button btnsend = null;
 
+
+   //defautl scenes
    private Scene newScene = null;
    private Stage newStage = null;
    private AmongUsSettings settings = new AmongUsSettings();
 
+
+   //the players name 
    private String name;
 
    private XML_STUFF xmlSettings = new XML_STUFF();
+
+   //is the player an imposter 
    private boolean isImposter;
 
+   
+   /** 
+    * @param _args
+    */
    // main program
    public static void main(String[] _args) {
       args = _args;
       launch(args);
    }
 
+   
+   /** 
+    * @param _stage
+    */
    // start() method, called via launch
    public void start(Stage _stage) {
 
       // stage seteup
       stage = _stage;
-      stage.setTitle("Game2D Starter");
+      stage.setTitle("Among us Game");
       stage.setOnCloseRequest(
             new EventHandler<WindowEvent>() {
                public void handle(WindowEvent evt) {
                   System.exit(0);
                }
             });
-
+      //strating screen 
       menuSreen();
       // root pane
       // initializeScene();
    }
 
    // a method that is wehre the player begins and connects to the server
+   /*
+    * menuSreen - a method to create a start up screen with a menu
+    */
    private void menuSreen() {
       FlowPane root = new FlowPane();
-
+      //button to strat the intial connection to the server and ask for the players name
       Button btnStart = new Button("Start");
       btnStart.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -165,12 +204,15 @@ public class Game2DClean extends Application {
                // TODO Auto-generated catch block
                e.printStackTrace();
             }
+            //puts the players into a waiting lobby waiting for other players
             waitingLobbby();
 
          }
 
       });
 
+
+      //chagning the charcerts deafult player 
       Button changeCharacter = new Button("Change Character");
       changeCharacter.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -204,7 +246,8 @@ public class Game2DClean extends Application {
          }
 
       });
-
+      
+      //chagning the deafult settings 
       Button btnSettings = new Button("Settings");
       btnSettings.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -228,10 +271,11 @@ public class Game2DClean extends Application {
             Label lblIpAddres = new Label("Ip Address:");
             TextField txtIpAddress = new TextField("IP" + xmlSettings.player.getServerIP());
 
-            settingsRoot.getChildren().addAll(lblPortNum, txtIpNum, lblKillCoolDown, txtKillCoolDown, lblKillDis,
-                  txtKillDistance, lblSpeed, txtSpeed, lblIpAddres, txtIpAddress);
-
             Button btnSave = new Button("Save Changes");
+            settingsRoot.getChildren().addAll(lblPortNum, txtIpNum, lblKillCoolDown, txtKillCoolDown, lblKillDis,
+                  txtKillDistance, lblSpeed, txtSpeed, lblIpAddres, txtIpAddress,btnSave);
+
+            
 
             btnSave.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -281,6 +325,7 @@ public class Game2DClean extends Application {
       // masterCrewmate = new CrewmateRacer(true, CREWMATE_IMAGE, moveablebackground);
 
       int playerIndex = 0;
+      //putting the player on the server 
       try {
          // adding the player to the arraylist on the server
          oos.writeObject("AddToServer");
@@ -304,10 +349,10 @@ public class Game2DClean extends Application {
       Button btnStart = new Button("Start Game");
       // starting the actaul game
       btnStart.setOnAction(new EventHandler<ActionEvent>() {
-
+         
          @Override
          public void handle(ActionEvent event) {
-            //
+            //strating the game 
             try {
                oos.writeObject("Begin");
                indexOfPlayrInArrayList = (Integer) ois.readObject();
@@ -318,7 +363,7 @@ public class Game2DClean extends Application {
                   }
 
                }
-
+               //making the game start 
                initializeScene();
             } catch (IOException e) {
                // TODO Auto-generated catch block
@@ -345,6 +390,9 @@ public class Game2DClean extends Application {
    }
 
    // start the game scene
+   /*
+    * initializeScene() -  method to start up the game 
+    */
    public void initializeScene() {
 
       // try {
@@ -367,13 +415,16 @@ public class Game2DClean extends Application {
       // e.printStackTrace();
       // }
 
+      //creating a palce for all the elements 
       root = new StackPane();
       posistion = new Collison();
 
       // creating a player for a differnt plaeyr to connect to
 
       // add to the root
+      //creating a movable background 
       moveablebackground = new MovableBackground(MASK_IMAGE, BACKGROUND_IMAGE);
+
       this.root.getChildren().add(moveablebackground);
 
       // Adding an interactable object
@@ -388,7 +439,9 @@ public class Game2DClean extends Application {
       task3.setStupidX(-845);
       task3.setStupidY(565);
       task3.moveInteractable(1600, -100);
-      EmergencyButton emergencyButton = new EmergencyButton("EmergencyButton.png");
+
+      //making an emergency button 
+      EmergencyButton emergencyButton = new EmergencyButton("emg.png");
       Interactable task4 = new Interactable("amongus.png");
       task4.setStupidX(739);
       task4.setStupidY(-339);
@@ -422,14 +475,21 @@ public class Game2DClean extends Application {
       // e.printStackTrace();
       // }
 
+
+      //making the master crewmate for this player
       masterCrewmate = new CrewmateRacer(isImposter, CREWMATE_IMAGE,moveablebackground);
       // moveablebackground);
       // masterCrewmate = new CrewmateRacer(false, CREWMATE_IMAGE, moveablebackground);
+
+
 
       masterCrewmate.setLocationOnServer(indexOfPlayrInArrayList);
       masterCrewmate.setName(name);
       otherCrewmates.add(masterCrewmate);
 
+
+
+      //Adding all the player from the server to this players game 
       for (int i = 0; i < playerPoints.size(); i++) {
          if (playerPoints.get(i).getIndex() != indexOfPlayrInArrayList) {
             CrewmateRacer temp = new CrewmateRacer(playerPoints.get(i).isImposter(),
@@ -543,31 +603,45 @@ public class Game2DClean extends Application {
       // updating the posistion of player each frame
 
       // This is the thread for other player movement and updating their psositons
+
+      // putting all the other players on the strating posistion
       for (int i = 0; i < otherCrewmates.size(); i++) {
          if (otherCrewmates.get(i).getLocationOnServer() != indexOfPlayrInArrayList) {
             otherCrewmates.get(i).update(-1930, -160);
          }
 
       }
-      // recveing thread
+      // recveing thread from server 
       Timer reciver = new Timer();
       TimerTask recivingInfo = new TimerTask() {
 
          @Override
          public void run() {
             try {
+               //always wating for a message from the server 
                Object obj = ois.readObject();
                if (obj instanceof String) {
+                  //getting a command from the server
                   String command = (String) obj;
+               
                   switch (command) {
+                     //when an imposter sabtoage everyone else change the speed
                      case "changeSpeed":
-                        moveablebackground.setSpeed((int) ois.readObject());
+                        synchronized(playerPoints){
+                           int speed = (int) ois.readObject();
+                           moveablebackground.setSpeed(speed);
+                        }
+                        
                         break;
                      case "newplayer":
                         break;
+                     //method to update other plyaers posstion based on their old positions 
                      case "move":
+
                         int size = (int) ois.readObject();
                         ArrayList<PlayerPoint> oldLocations = new ArrayList<>();
+
+                        //recving the list of player points from the server 
                         for (int i = 0; i < size; i++) {
                            PlayerPoint player = (PlayerPoint) ois.readObject();
                            oldLocations.add(player);
@@ -575,6 +649,8 @@ public class Game2DClean extends Application {
                         // ArrayList<PlayerPoint> oldLocations = (ArrayList<PlayerPoint>)
                         // ois.readObject();
 
+
+                        //looking through the old locations and updating other players movements 
                         for (int i = 0; i < oldLocations.size(); i++) {
                            System.out.println(oldLocations.get(i).getIndex() + " old X: " + oldLocations.get(i).getX()
                                  + " old Y " + oldLocations.get(i).getY());
@@ -582,6 +658,8 @@ public class Game2DClean extends Application {
                            int index = oldLocations.get(i).getIndex();
                            // System.out.println("Mastercrewmate INdex:
                            // "+masterCrewmate.getLocationOnServer());
+                           
+                           //looking through the crewmates to correctly change the players posistion
                            for (int y = 0; y < otherCrewmates.size(); y++) {
                               // System.out.println(otherCrewmates.get(y).getLocationOnServer());
                               // System.out.println(index);
@@ -592,15 +670,21 @@ public class Game2DClean extends Application {
                                  int changeInX = (int) oldLocations.get(i).getX() - masterCrewmate.getBackgroundPosX();
                                  int changeInY = (int) oldLocations.get(i).getY() - masterCrewmate.getBackgroundPosY();
                                  otherCrewmates.get(y).updateOnline(-changeInX, -changeInY);
+                                 otherCrewmates.get(y).update(oldLocations.get(i).getX(), oldLocations.get(i).getY());
                                  // System.out.println("Chnage other crewmates posistion");
                               }
                            }
 
                         }
                         break;
+                     //calling a meeting if a dead body is reported or emergency button is pressed
                      case "meeting":
                         if (stopRepeat == 0) {
+                           //puttig player in the right posistion 
                            masterCrewmate.meeting();
+                           
+
+                           //making a chat popup to send informatioin between players
                            Platform.runLater(() -> {
                               chatbox.setText("");
                               message.setText("");
@@ -609,7 +693,7 @@ public class Game2DClean extends Application {
 
                               FlowPane middle = new FlowPane();
                               btnsend = new Button("Send");
-
+                              //button to send a message to others 
                               btnsend.setOnAction(new EventHandler<ActionEvent>() {
 
                                  @Override
@@ -628,7 +712,7 @@ public class Game2DClean extends Application {
                                  }
 
                               });
-
+                              //button to vote for a player
                               Button btnVote = new Button("Vote");
                               btnVote.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -672,6 +756,7 @@ public class Game2DClean extends Application {
                            // create the new stage
                         }
                         break;
+                     //getting the message from the server from other players
                      case "addmessage":
 
                         String message = (String) ois.readObject();
@@ -686,8 +771,10 @@ public class Game2DClean extends Application {
                         });
 
                         break;
+                     //when all players voted the meeting will end 
                      case "endmeeting":
                         stopRepeat = 0;
+                        //getting the player that was voted off
                         PlayerPoint playerVotedOff = (PlayerPoint) ois.readObject();
 
                         Platform.runLater(new Runnable() {
@@ -704,6 +791,7 @@ public class Game2DClean extends Application {
                            }
 
                         });
+                        //Finding the player that matches the index of the player that was voted off 
                         for (int i = 0; i < otherCrewmates.size(); i++) {
                            if (otherCrewmates.get(i).getLocationOnServer() == playerVotedOff.getIndex()) {
                               otherCrewmates.get(i).setAlive(false);
@@ -713,15 +801,19 @@ public class Game2DClean extends Application {
                         }
 
                         break;
+                     //a player is killed by an imposter and the message is sent to all other players
+                     //making the player killed on the this players game 
                      case "dead":
                         PlayerPoint deadCrewmate = (PlayerPoint) ois.readObject();
                         for (int i = 0; i < otherCrewmates.size(); i++) {
                            if (otherCrewmates.get(i).getLocationOnServer() == deadCrewmate.getIndex()) {
+                              
                               System.out.println("This player has dead " + otherCrewmates.get(i).getName());
                               otherCrewmates.get(i).setAlive(false);
 
                               if (masterCrewmate.getLocationOnServer() == deadCrewmate.getIndex()) {
                                  System.out.println("You have died");
+                                 masterCrewmate.getaPicView().setOpacity(0.5);
                               } else {
                                  // this player is not killing the other player but instead on this players
                                  // screen amking them look dead
@@ -730,7 +822,11 @@ public class Game2DClean extends Application {
                            }
 
                         }
+                        Alert alert = new Alert(AlertType.INFORMATION, "This player has dead " + deadCrewmate.getName());
+                        alert.setHeaderText("Somone has Dead");
+                        alert.showAndWait();
                         break;
+                     //a end case for when the imposters win
                      case "impostersWin":
                         Platform.runLater(new Runnable() {
 
@@ -744,8 +840,20 @@ public class Game2DClean extends Application {
                         });
 
                         break;
-                  }
+                     //a end case if the players win
+                     case "playersWin":
+                        Platform.runLater(new Runnable() {
+                           @Override
+                           public void run() {
+                              Alert alert = new Alert(AlertType.INFORMATION, "The players win");
+                              alert.showAndWait();
+                           }
 
+                        });
+                        break;
+                  }
+               
+                  //getting othe players movement so they move on the current players screen 
                } else if (obj instanceof PlayerPoint) {
                   PlayerPoint backgroundPos = (PlayerPoint) obj;
                   // System.out.println("Other player background pos: " + " X " +
@@ -784,8 +892,10 @@ public class Game2DClean extends Application {
          }
 
       };
-      reciver.scheduleAtFixedRate(recivingInfo, 10, 50);
+      reciver.scheduleAtFixedRate(recivingInfo, 10, 10);
 
+
+      //handleing the enitre normal running of the game 
       timer = new AnimationTimer() {
          long startTime = System.nanoTime();
          int frameCount = 0;
@@ -807,14 +917,16 @@ public class Game2DClean extends Application {
                // Reset start time and frame count
                startTime = now;
                frameCount = 0;
-               // delay this
 
             }
 
+            //updating the player posisiton and detetecting collison 
             Point2D location = moveablebackground.update(moveDown, moveUp, moveLeft, moveRight);
+            //settiing the background pos for the main player
             masterCrewmate.setBackgroundPosX(moveablebackground.getBackgroundPosX());
             masterCrewmate.setBackgroundPosY(moveablebackground.getBackgroundPosY());
             if (moveDown || moveUp || moveLeft || moveRight) {
+
                // send new posistion to server
                masterCrewmate.update(location.getX(), location.getY());
                // sending the background coordinates with its index to the server
@@ -838,6 +950,7 @@ public class Game2DClean extends Application {
 
             }
 
+            //moving tasks and buttons to stay in the same place
             task1.update(location.getX(), location.getY());
             task2.update(location.getX(), location.getY());
             task3.update(location.getX(), location.getY());
@@ -892,6 +1005,9 @@ public class Game2DClean extends Application {
                   masterCrewmate.getBtnUse().setDisable(true);
                }
 
+
+               //when the button i avalibale to be pusehd and the player
+               //is the near a task they can then activate that task 
                if (masterCrewmate.getBtnUse().isPressed()) {
 
                   taskStage = new Stage();
@@ -904,6 +1020,7 @@ public class Game2DClean extends Application {
                         public void handle(WindowEvent event) {
                            if (task.isCompleted()) {
                               try {
+                                 //adding to a counter on the server 
                                  oos.writeObject("addTask");
                                  oos.flush();
                               } catch (IOException e) {
@@ -1057,7 +1174,7 @@ public class Game2DClean extends Application {
                }
             }
 
-            // for reproting or emergency button
+            // for reproting a dead body or emergency button
             if (emergencyButton.distanceEmgButton(masterCrewmate) || check()) {
                synchronized (masterCrewmate) {
                   masterCrewmate.getBtnReport().setDisable(false);
@@ -1068,6 +1185,8 @@ public class Game2DClean extends Application {
                masterCrewmate.getBtnReport().setDisable(true);
             }
 
+
+            //reporting a creating a metting where a player could be voted off
             if (masterCrewmate.getBtnReport().isPressed()) {
                if (masterCrewmate.getToUse().equals("Emergency")) {
                   masterCrewmate.setInMeeting(true);
@@ -1080,6 +1199,9 @@ public class Game2DClean extends Application {
                }
             }
 
+
+            //only for imposters
+            //code to kill other players 
             if (masterCrewmate.isImposter()) {
                CrewmateRacer killable = null;
                for (int i = 0; i < otherCrewmates.size(); i++) {
@@ -1093,7 +1215,7 @@ public class Game2DClean extends Application {
                   }
 
                }
-
+               //killing a differnt player and reporting that to the server 
                if (masterCrewmate.getBtnKill().isPressed()) {
                   masterCrewmate.kill(killable);
                   try {
@@ -1108,6 +1230,7 @@ public class Game2DClean extends Application {
 
                }
 
+               //the imposter is always able to press the the sabtaoge button in order to limit player speed 
                if (masterCrewmate.getBtnSabatoage().isPressed()) {
                   try {
                      oos.writeObject("sabtoge");
@@ -1132,7 +1255,7 @@ public class Game2DClean extends Application {
                         }
 
                      };
-                     slow.schedule(slowLimit, 10000);
+                     slow.schedule(slowLimit, 20000);
 
                   } catch (IOException e) {
                      // TODO Auto-generated catch block
@@ -1150,6 +1273,13 @@ public class Game2DClean extends Application {
 
    }
 
+   
+   /** 
+    * checkDistance checking distance between two game objects 
+    * @param crewmate
+    * @param task
+    * @return boolean
+    */
    // method to activate if the player is close enough to a task
    public boolean checkDistance(CrewmateRacer crewmate, Interactable task) {
       double xDis = 0;
@@ -1169,6 +1299,11 @@ public class Game2DClean extends Application {
       }
    }
 
+   
+   /** 
+    * check - seeing if other crewmates on the server are alive for player to kill 
+    * @return boolean
+    */
    public boolean check() {
       for (int i = 0; i < otherCrewmates.size(); i++) {
          if (otherCrewmates.get(i).getLocationOnServer() != masterCrewmate.getLocationOnServer()) {

@@ -19,6 +19,11 @@ public class TaskSum extends Application{
 
     private TextField sumField;
 
+    
+    /** 
+     * @param primaryStage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         num1 = (int) (Math.random() * 100);

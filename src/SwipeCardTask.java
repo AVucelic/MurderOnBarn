@@ -21,6 +21,12 @@ public class SwipeCardTask extends Application {
 
 
 
+    
+    /** 
+     * method to start the game 
+     * @param primaryStage
+     * @throws Exception
+     */
     public void start(Stage primaryStage) throws Exception {
         // Create GUI components
         progressBar = new ProgressBar();
@@ -64,6 +70,10 @@ public class SwipeCardTask extends Application {
         primaryStage.show();
     }
 
+    
+    /** 
+     * @param event
+     */
     private void handleCardPressed(MouseEvent event) {
         // Start dragging the card when the player clicks on it
         card.setTranslateX(event.getX());

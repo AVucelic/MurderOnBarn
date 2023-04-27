@@ -35,6 +35,10 @@ public class TaskWires extends Application implements EventHandler<ActionEvent>{
 
     private boolean completed = false;
 
+    
+    /** 
+     * @param args
+     */
     public static void main(String[] args) {
         launch(args);
     }
