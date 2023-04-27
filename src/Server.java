@@ -15,9 +15,7 @@ import javafx.stage.*;
 import javafx.geometry.*;
 
 /**
- * MyMThreadServerForRecords - a class meant to act as a server for holding
- * records
- * 
+ * Server - meant to act as a server for the game and send information between players
  * @author Luka Lasic
  * @since 22-3-2023
  */
@@ -36,7 +34,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
    // holding the orders that are sent in
 
    private ArrayList<PlayerPoint> oldLocations = new ArrayList<>();
-
+   private int endGameCount = 0;
    // gui atr
    private Button btnStart = null;
    private Button btnConvert = null;
@@ -53,6 +51,8 @@ public class Server extends Application implements EventHandler<ActionEvent> {
 
    private int numOfTotalTasks = 0;
    private int numOfCompletedTasks = 0;
+
+   private int imposterStopper = 0;
 
    /**
     * ServerThread - a server menat to allow multiple connectioins
@@ -162,7 +162,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
             oos = new ObjectOutputStream(cSocket.getOutputStream());
             ois = new ObjectInputStream(cSocket.getInputStream());
             // Allowing the client to keep being read until it disonnects
-
+            //adding this output stream and hard codd location to the site 
             outputStreams.add(oos);
             oldLocations.add(new PlayerPoint(-1930, -160, index));
             while (true) {
@@ -174,17 +174,20 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                   e.printStackTrace();
                }
                if (obj instanceof String) {
+                  //commands from the client to the server
                   String commad = (String) obj;
                   switch (commad) {
+                     //an imposter sabtoagting everyone elses game 
                      case "sabtoge":
                         int speed = (int)ois.readObject();
                         for (int i = 0; i < outputStreams.size(); i++) {
                            outputStreams.get(i).writeObject("changeSpeed");
-                           outputStreams.get(i).close();
+                           outputStreams.get(i).flush();
                            outputStreams.get(i).writeObject(speed);
-                           outputStreams.get(i).close();
+                           outputStreams.get(i).flush();
                         }
                         break;
+                     //adding tasks shen a player completes them 
                      case "addTask":
                         synchronized(outputStreams){
                            numOfCompletedTasks++;
@@ -198,10 +201,18 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                               
                            });
                         }
+                        if(numOfCompletedTasks >= numOfTotalTasks){
+                           for (int i = 0; i < outputStreams.size(); i++) {
+                              outputStreams.get(i).writeObject("playersWin");
+                              outputStreams.get(i).flush();
+                           }
+                        }
 
                         break;
-
+                        //adding some info from the clinet to their index on oldlocations 
+                        
                      case "addName":
+                        
                         try {
                            String name = (String)ois.readObject();
                            oldLocations.get(index).setName(name);
@@ -224,22 +235,41 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         }
                         break;
                      // command to begin the game by sedning
+                     //strating the clinet and telling who the imposter is 
                      case "Begin":
-                        synchronized(outputStreams){
-                           numOfTotalTasks = 3 * numPlayers;
-                        }
+                        
                         oos.writeObject((Integer) index);
                         oos.flush();
-
-                        int randImp = (int)(Math.random() * oldLocations.size()); 
-                        oldLocations.get(randImp).setImposter(true);
+                        //randomly selecting someone as an imposter
+                        if(imposterStopper == 0){
+                           int randImp = (int)(Math.random() * oldLocations.size()); 
+                           oldLocations.get(randImp).setImposter(true);
+                           imposterStopper++;
+                        }
+                        
 
                         ArrayList<PlayerPoint> playerPoints = new ArrayList<>(oldLocations);
                         oos.writeObject(playerPoints);
                         oos.flush();
 
+                        //setting how many global taks need to be done in order for game to end 
+                        //and w for non imposters
+                        int counterImp = 0;
+                        for (int i = 0; i < oldLocations.size(); i++) {
+                           if(oldLocations.get(i).isImposter()) counterImp++;
+                        }
+                        synchronized(outputStreams){
+                           numOfTotalTasks = 3 * numPlayers - 3 * counterImp;
+                        }
+
                         
                         break;
+                     case "sabtoge2":
+                        for (int i = 0; i < outputStreams.size(); i++) {
+                           outputStreams.get(i).writeObject("annoyingPop");
+                        }
+                        break;
+                     //adding the player to the server 
                      case "AddToServer":
                         String name = (String)ois.readObject();
                         String imageName = (String)ois.readObject();
@@ -259,6 +289,9 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         }
                         oos.flush();
                         break;
+
+                     //Sending the aarray of oldlocations to this player when this players move on their screen
+                     //in order 
                      case "move":
                         // just send array list of old locations
 
@@ -295,6 +328,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         
 
                         break;
+                     //calling a meeting for all players and setting the number of votes for each player 
                      case "Meeting":
                         numVotes = 0;
                         for (int i = 0; i < oldLocations.size(); i++) {
@@ -304,6 +338,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                            outputStreams.get(i).writeObject("meeting");
                         }
                         break;
+                     //sending chat to other players 
                      case "Chat":
                         try {
                            String message = (String) ois.readObject();
@@ -328,8 +363,10 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                            e.printStackTrace();
                         }
                         break;
+                     //voting for the player 
                      case "Vote": 
                         try {
+                           //looking throuhg the list and matching indexes and adding that players number of votes 
                            String playerVoted = (String)ois.readObject();
                            for (int i = 0; i < oldLocations.size(); i++) {
                               if(oldLocations.get(i).getName().equals(playerVoted)){
@@ -340,6 +377,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                               }
                               
                            }
+                           //finding the player to vote off
                            if(numVotes == oldLocations.size()){
                               PlayerPoint votedOff = new PlayerPoint(-99, -99, -99);
                               votedOff.setNumVotes(0);
@@ -357,14 +395,15 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                                  outputStreams.get(i).flush();
 
                               }
-                              if(endGame() == 1){
-                                 for (int i = 0; i < outputStreams.size(); i++) {
-                                    outputStreams.get(i).writeObject("impostersWin");
-                                    outputStreams.get(i).flush();
-                                 }
-                              }else if(endGame() == 0){
+                              //end game scanario
+                              if(endGame() == 0){
                                  for (int i = 0; i < outputStreams.size(); i++) {
                                     outputStreams.get(i).writeObject("playersWin");
+                                    outputStreams.get(i).flush();
+                                 }
+                              } else if(endGame() == 1){
+                                 for (int i = 0; i < outputStreams.size(); i++) {
+                                    outputStreams.get(i).writeObject("impostersWin");
                                     outputStreams.get(i).flush();
                                  }
                               }
@@ -376,7 +415,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                            e.printStackTrace();
                         }
                         break;
-
+                     //adding the neyplayer to thee server
                      case "newplayer":
                         for (int i = 0; i < outputStreams.size(); i++) {
                            if (i == index) {
@@ -386,6 +425,7 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                            outputStreams.get(i).flush();
                         }
                         break;
+                     //imposter killing an another player and updating other players
                      case "kill":
                         try {
                            
@@ -415,12 +455,17 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                            // TODO Auto-generated catch block
                            e.printStackTrace();
                         }
-                        if(endGame() == 1){
+                        if(endGameCount == 0){
+
+                           if(endGame() == 1){
+                              endGameCount++;
                            for (int i = 0; i < outputStreams.size(); i++) {
                               outputStreams.get(i).writeObject("impostersWin");
                               outputStreams.get(i).flush();
                            }
                         }
+                        }
+                        
                         break;
                   }
                } else if (obj instanceof CrewmateRacer) {
@@ -433,14 +478,14 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                   synchronized(oldLocations){
                      oldLocations.get(index).setX(locatioin.getX());
                      oldLocations.get(index).setY(locatioin.getY());
-                     Platform.runLater(new Runnable() {
+                     // Platform.runLater(new Runnable() {
    
-                        @Override
-                        public void run() {
-                           txtPlayerLoc.setText("(" +locatioin.getX() +","+  locatioin.getY() +  ")");
-                        }
+                     //    @Override
+                     //    public void run() {
+                     //       txtPlayerLoc.setText("(" +locatioin.getX() +","+  locatioin.getY() +  ")");
+                     //    }
                         
-                     });
+                     // });
 
                   }
                   System.out.println(cName + "X: " + locatioin.getX() + " Y: " + locatioin.getY());
@@ -465,12 +510,22 @@ public class Server extends Application implements EventHandler<ActionEvent> {
       }
    }
 
+   
+   /** 
+    * main launches the gui 
+    * @param args
+    */
    public static void main(String[] args) {
 
       launch(args);
 
    }
 
+   
+   /** 
+    * handle- making buttons work 
+    * @param event
+    */
    @Override
    public void handle(ActionEvent event) {
       // getting the button that pressed
@@ -502,6 +557,13 @@ public class Server extends Application implements EventHandler<ActionEvent> {
 
       }
    }
+
+
+   
+   /** 
+    * endGame - checking if imposters or players win 
+    * @return int
+    */
    public int endGame(){
       int numPlayers = 0;
       int numImposters = 0;
@@ -547,7 +609,6 @@ public class Server extends Application implements EventHandler<ActionEvent> {
       stage.setTitle("GUI Starter");
 
       // when the window is closed convert everything from the array list in an
-      // orders.obj file
       stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
          @Override
