@@ -15,9 +15,7 @@ import javafx.stage.*;
 import javafx.geometry.*;
 
 /**
- * MyMThreadServerForRecords - a class meant to act as a server for holding
- * records
- * 
+ * Server - meant to act as a server for the game and send information between players
  * @author Luka Lasic
  * @since 22-3-2023
  */
@@ -53,6 +51,8 @@ public class Server extends Application implements EventHandler<ActionEvent> {
 
    private int numOfTotalTasks = 0;
    private int numOfCompletedTasks = 0;
+
+   private int imposterStopper = 0;
 
    /**
     * ServerThread - a server menat to allow multiple connectioins
@@ -241,8 +241,12 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         oos.writeObject((Integer) index);
                         oos.flush();
                         //randomly selecting someone as an imposter
-                        int randImp = (int)(Math.random() * oldLocations.size()); 
-                        oldLocations.get(randImp).setImposter(true);
+                        if(imposterStopper == 0){
+                           int randImp = (int)(Math.random() * oldLocations.size()); 
+                           oldLocations.get(randImp).setImposter(true);
+                           imposterStopper++;
+                        }
+                        
 
                         ArrayList<PlayerPoint> playerPoints = new ArrayList<>(oldLocations);
                         oos.writeObject(playerPoints);
@@ -259,6 +263,11 @@ public class Server extends Application implements EventHandler<ActionEvent> {
                         }
 
                         
+                        break;
+                     case "sabtoge2":
+                        for (int i = 0; i < outputStreams.size(); i++) {
+                           outputStreams.get(i).writeObject("annoyingPop");
+                        }
                         break;
                      //adding the player to the server 
                      case "AddToServer":

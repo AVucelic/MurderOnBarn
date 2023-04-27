@@ -635,6 +635,26 @@ public class Game2DClean extends Application {
                         break;
                      case "newplayer":
                         break;
+                     case "annoyingPop":
+                        if(!masterCrewmate.isImposter()){
+                           
+                              
+                              Platform.runLater(new Runnable() {
+
+                                 @Override
+                                 public void run() {
+                                    Alert annoyingPop = new Alert(AlertType.WARNING, "Shut Down the Game or Imposters Win");
+                                    annoyingPop.setHeaderText("Imposter Prank");
+                                    annoyingPop.showAndWait();
+                                 }
+                                 
+                              });
+                              
+                                 
+                              
+                           
+                        }
+                        break;
                      //method to update other plyaers posstion based on their old positions 
                      case "move":
 
@@ -796,6 +816,13 @@ public class Game2DClean extends Application {
                            if (otherCrewmates.get(i).getLocationOnServer() == playerVotedOff.getIndex()) {
                               otherCrewmates.get(i).setAlive(false);
                               System.out.println(otherCrewmates.get(i).getName() + " was voted off and killed");
+                              if(otherCrewmates.get(i).getLocationOnServer() == masterCrewmate.getLocationOnServer()){
+                                 masterCrewmate.getaPicView().setOpacity(0.5);
+                              }else{
+                                 masterCrewmate.kill(otherCrewmates.get(i));
+                              }
+                              
+                              
                            }
 
                         }
@@ -1228,6 +1255,16 @@ public class Game2DClean extends Application {
                      e.printStackTrace();
                   }
 
+               }
+               if(masterCrewmate.getBtnSabatoage2().isPressed()){
+                  try {
+                     oos.writeObject("sabtoge2");
+                     oos.flush();
+                  } catch (IOException e) {
+                     // TODO Auto-generated catch block
+                     e.printStackTrace();
+                  }
+                  
                }
 
                //the imposter is always able to press the the sabtaoge button in order to limit player speed 

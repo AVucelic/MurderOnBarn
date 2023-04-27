@@ -57,6 +57,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
 
    private Button btnKill;
    private Button btnSabatoage;
+   private Button btnSabatoage2;
 
    private String toUse = "";
 
@@ -69,6 +70,7 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
 
 
    private boolean alive;
+   
 
 
    /**
@@ -162,10 +164,11 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
       if (isImposter) {
          this.btnKill = new Button("Kill");
          this.btnSabatoage = new Button("Sabtaoge");
+         this.btnSabatoage2 = new Button("Sabtaoge2");
          this.btnKill.setDisable(false);
          btnKill.setFocusTraversable(false);
          btnSabatoage.setFocusTraversable(false);
-         btnsForUser.getChildren().addAll(btnReport, btnKill, btnSabatoage);
+         btnsForUser.getChildren().addAll(btnReport, btnKill, btnSabatoage,btnSabatoage2);
       } else {
          // aPicView = new ImageView(CREWMATE_RUNNERS);
          this.btnUse = new Button("Use");
@@ -682,6 +685,10 @@ public class CrewmateRacer extends Pane implements EventHandler<ActionEvent>,Ser
     */
    public void setProgressBar(ProgressBar progressBar) {
       this.progressBar = progressBar;
+   }
+
+   public Button getBtnSabatoage2() {
+       return btnSabatoage2;
    }
 
    
