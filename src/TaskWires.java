@@ -21,6 +21,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+/**
+ * Wires Task
+ * 
+ * @author Luka Lasic
+ * @author Arian Vucelic
+ * @since 20-4-2023
+ */
+
 public class TaskWires extends Application implements EventHandler<ActionEvent>{
     //Arays for colors and indexes
     private static final List<Integer> WIRE_ORDER = Arrays.asList(1, 3, 5, 2, 6, 4);

@@ -10,7 +10,18 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+/**
+ * Swipe Card Task 
+ * 
+ * @author Luka Lasic
+ * @author Arian Vucelic
+ * @since 20-4-2023
+ */
+
 public class SwipeCardTask extends Application {
+
+    //Attributes
+
     private ProgressBar progressBar;
     private ImageView card;
     private Label swipeCountLabel;
@@ -34,6 +45,8 @@ public class SwipeCardTask extends Application {
 
         card = new ImageView();
         card.setImage(cardssss);
+
+        //Set event listener for mouse event
         card.setOnMousePressed(this::handleCardPressed);
         card.setOnMouseDragged(this::handleCardDragged);
 
@@ -45,6 +58,7 @@ public class SwipeCardTask extends Application {
         Button completeButton = new Button("Complete Task");
         completeButton.setDisable(true);
         completeButton.setOnAction(event -> {
+            //Update swipe count label based on the number of swipes
             if (swipeCount == 5) {
                 swipeCountLabel.setText("Task complete!");
             } else {
@@ -72,6 +86,7 @@ public class SwipeCardTask extends Application {
 
     
     /** 
+     * Handle the mouse press event on the card
      * @param event
      */
     private void handleCardPressed(MouseEvent event) {
@@ -80,6 +95,10 @@ public class SwipeCardTask extends Application {
         card.setTranslateY(event.getY());
     }
 
+    /**
+     * Handle the mouse drag event on the card
+     * @param event
+     */
     private void handleCardDragged(MouseEvent event) {
         // Move the card as the player drags it
         card.setTranslateX(event.getX());
@@ -90,6 +109,7 @@ public class SwipeCardTask extends Application {
             swipeCount++;
             swipeCountLabel.setText("Swipes remaining: " + (5-swipeCount));
             progressBar.setProgress(swipeCount / 5.0);
+            //If the task is completed, update the state and GUI components
             if (swipeCount == 5) {
                 completed = true;
                 card.setDisable(true);
@@ -98,14 +118,23 @@ public class SwipeCardTask extends Application {
         }
     }
 
+    //Main method
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * 
+     * @return
+     */
     public boolean isCompleted() {
         return completed;
     }
 
+    /**
+     * 
+     * @param completed
+     */
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }

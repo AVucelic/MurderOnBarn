@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
  * Collison - a class to deal with collison
  * 
  * @author Luka Lasic
+ * @author Arian Vucelic
  * @since 20-4-2023
  */
 public class Collison {
