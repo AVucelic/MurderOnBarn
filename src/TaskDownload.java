@@ -1,10 +1,8 @@
 import java.util.ArrayList;
-
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.AmbientLight;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,7 +17,15 @@ import javafx.stage.Stage;
 /**
  * @ASSESSME.INTENSITY:LOW
  */
+/**
+ * Download Task
+ * 
+ * @author Luka Lasic
+ * @author Arian Vucelic
+ * @since 20-4-2023
+ */
 public class TaskDownload extends Application implements EventHandler<ActionEvent>{
+    //Attributes
     private Stage stage;
     private Scene scene;
     private Button btnStart = new Button("Start the Download!");
@@ -31,12 +37,18 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
 
     
     /** 
+     * Main method
      * @param args
      */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /*
+     * Handle button click event
+     * Paramater event
+     * 
+     */
     @Override
     public void handle(ActionEvent event) {
         Button btn = (Button)event.getSource();
@@ -49,6 +61,7 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //Instatiating the GUI components
         this.stage = primaryStage;
         stage.setTitle("Downloading Virus To Your Computer!");
         VBox root = new VBox();
@@ -80,6 +93,7 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
         stage.show();
     }
     
+    //Method for creating new thread for each InnerClass instnace
     public void doStartThread(){
         progress.forEach(progressCount -> {
             Thread thr1 = new Thread(progressCount);
@@ -88,12 +102,14 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
         });
     }
 
+    //Inner Class of TaskDownload
     class InnerClass extends FlowPane implements Runnable{
         int a = 0;
         ProgressBar pb = null;
         Label lbl1;
         Label lbl2;
 
+        //Constructor that creates new Progresss Bar 
         public InnerClass(int a){
             super(10, 10);
             this.a = a;
@@ -107,6 +123,7 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
 
         }
 
+        //Method to update progress bar and loops it till it is at 100%
         @Override
         public void run() {
             System.out.println("Progress bar no" + a + " is running");
@@ -126,6 +143,7 @@ public class TaskDownload extends Application implements EventHandler<ActionEven
                     }
                 });
 
+                //If progress is 100, alert the user
                 if(fIn == 100){
                     javafx.application.Platform.runLater(new Runnable(){
                         @Override

@@ -3,6 +3,7 @@ import javafx.scene.image.Image;
 /**
  * @ASSESSME.INTENSITY:LOW
  */
+
 public class TaskClickImage {
     private final Image blueRect = new Image("plavi.png");
     private final Image pinkRect = new Image("ljubicasti.png"); 
